@@ -1,0 +1,2772 @@
+diff --git a/arm2hpdl.c b/arm2hpdl.c
+index 956a860..6c6b4e3 100644
+--- a/arm2hpdl.c
++++ b/arm2hpdl.c
+@@ -47,20 +47,21 @@ void
+ usage(void)
+ {
+ 	fprintf(stderr,
+-"Usage:\n"
+-"	arm2hpdl [options] sihp1005.img > sihp1005.dl\n"
++"使用方式:\n"
++"	arm2hpdl [选项] sihp1005.img > sihp1005.dl\n"
+ "\n"
+-"	Add HP download header/trailer to an ARM ELF binary.\n"
+-"	If the file already has an HP header, just copy it to stdout.\n"
++"	为ARM ELF二进制文件添加惠普固件下载头与尾标识。\n"
++"	若文件已包含惠普头部，则直接原样输出至标准输出。\n"
+ "\n"
+-"Options:\n"
+-"       -D lvl      Set Debug level [%d]\n"
++"选项:\n"
++"       -D lvl      设置调试等级 [%d]\n"
+ 	, Debug
+ 	);
+ 
+ 	exit(1);
+ }
+ 
++
+ /*
+  * Compute HP-style checksum
+  */
+diff --git a/foo2hbpl2-wrapper.in b/foo2hbpl2-wrapper.in
+index ec770b0..6d55759 100755
+--- a/foo2hbpl2-wrapper.in
++++ b/foo2hbpl2-wrapper.in
+@@ -50,61 +50,60 @@ fi
+ 
+ usage() {
+ 	cat <<EOF
+-Usage:
+-	$BASENAME [options] [ps-file]
+-
+-	Foomatic printer wrapper for the foo2hbpl2 printer driver.
+-	This script reads a Postscript ps-file or standard input
+-	and converts it to a Xerox HBPL version 2 stream.
+-
+-Normal Options:
+--c                Print in color (else monochrome)
+--C colormode      Colormode [$COLORMODE]
+-                    10=ICM RGB color profile (using -G *.icm file)
+--d duplex         Duplex code to send to printer [$DUPLEX]
+-                    1=off, 2=longedge, 3=shortedge
+--m media          Media code to send to printer [$MEDIA]
+-		    1=plain, 2=bond, 3=lwcard, 4=lwgcard, 5=labels,
+-		    6=envelope, 7=recycled, 8=plain2, 9=bond2,
+-		    10=lwcard2, 11=lwgcard2, 12=recycled2
+--p paper          Paper code [$PAPER]
+-		    1=A4, 2=B5, 3=A5, 4=letter, 5=executive,
+-		    6=fanfoldgermanlegal/folio, 7=legal, 9=env#10,
+-		    10=envMonarch, 11=envC5, 12=envDL
+--n copies         Number of copies [$COPIES]
+--r <xres>x<yres>  Set device resolution in pixels/inch [$RES]
+--s source         Source code to send to printer [$SOURCE]
+-                    1=upper, 2=lower, 4=manual, 7=auto
+-		    Code numbers may vary with printer model.
+--t                Draft mode.  Every other pixel is white.
++用法:
++	$BASENAME [选项] [ps文件]
++
++	foo2hbpl2 打印机驱动的 Foomatic 包装脚本。
++	此脚本读取 Postscript 文件或标准输入，
++	并将其转换为 Xerox HBPL 版本 2 数据流。
++
++普通选项:
++-c                彩色打印（否则为黑白）
++-C colormode      颜色模式 [$COLORMODE]
++                    10=ICM RGB 色彩配置文件（使用 -G *.icm 文件）
++-d duplex         向打印机发送的双面打印代码 [$DUPLEX]
++                    1=关闭, 2=长边翻转, 3=短边翻转
++-m media          向打印机发送的介质代码 [$MEDIA]
++		    1=普通纸, 2=铜版纸, 3=轻质卡纸, 4=轻质光面卡纸, 5=标签,
++		    6=信封, 7=再生纸, 8=普通纸2, 9=铜版纸2,
++		    10=轻质卡纸2, 11=轻质光面卡纸2, 12=再生纸2
++-p paper          向打印机发送的纸张代码 [$PAPER]
++		    1=A4, 2=B5, 3=A5, 4=Letter, 5=Executive,
++		    6=折页德国Legal/对开, 7=Legal, 9=信封#10,
++		    10=信封Monarch, 11=信封C5, 12=信封DL
++-n copies         打印份数 [$COPIES]
++-r <xres>x<yres>  设置设备分辨率（像素/英寸）[$RES]
++-s source         向打印机发送的纸盒来源代码 [$SOURCE]
++                    1=上纸盒, 2=下纸盒, 4=手动, 7=自动
++		    代码可能因打印机型号而异
++-t                草稿模式（每隔一个像素变白）
+ -2/-3/-4/-6/-8/-10/-12/-14/-15/-16/-18
+-                  Print with N-up (requires psutils)
+--o orient         For N-up: -op is portrait, -ol is landscape, -os is seascape.
+-
+-Printer Tweaking Options:
+--u <xoff>x<yoff>  Set offset of upper left printable in pixels [varies]
+--l <xoff>x<yoff>  Set offset of lower right printable in pixels [varies]
+--L mask           Send logical clipping values from -u/-l in ZjStream [3]
+-                  0=no, 1=Y, 2=X, 3=XY
+--P                Do not output START_PLANE codes.  May be needed by some
+-                  monochrome-only printers.
+--X padlen         Add extra zero padding to the end of BID segments [16]
+-
+-Color Tweaking Options:
+--g gsopts         Additional options to pass to Ghostscript, such as
+-                  -dDITHERPPI=nnn, etc.  May appear more than once. []
+--G profile.icm    Convert profile.icm to a Postscript CRD using icc2ps and
+-                  adjust colors using the setcolorrendering PS operator.
+-                  $SHARE/icm/ will be searched for profile.icm.
+--I intent         Select profile intent from ICM file [$INTENT]
+-                  0=Perceptual, 1=Colorimetric, 2=Saturation, 3=Absolute
+--G gamma-file.ps  Prepend gamma-file to the Postscript input to perform
+-                  color correction using the setcolortransfer PS operator.
+-
+-Debugging Options:
+--S plane          Output just a single color plane from a color print [all]
+-                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black
+--D lvl            Set Debug level [$DEBUG]
++                  多页打印（需要 psutils）
++-o orient         多页打印方向：-op 纵向, -ol 横向, -os 倒置横向
++
++打印机调整选项:
++-u <xoff>x<yoff>  设置左上角可打印区域偏移量（像素）[可变]
++-l <xoff>x<yoff>  设置右下角可打印区域偏移量（像素）[可变]
++-L mask           在 ZjStream 中发送来自 -u/-l 的逻辑裁剪值 [3]
++                  0=禁用, 1=Y轴, 2=X轴, 3=XY轴
++-P                不输出 START_PLANE 代码。部分单色打印机可能需要此选项
++-X padlen         在 BID 段末尾添加额外的零填充 [16]
++
++色彩调整选项:
++-g gsopts         传递给 Ghostscript 的额外选项，例如
++                  -dDITHERPPI=nnn 等，可多次出现 []
++-G profile.icm    使用 icc2ps 将 profile.icm 转换为 Postscript CRD，
++                  并使用 setcolorrendering PS 操作符调整颜色。
++                  会搜索 $SHARE/icm/ 目录中的 profile.icm。
++-I intent         从 ICM 文件中选择配置意图 [$INTENT]
++                  0=感知, 1=色度, 2=饱和度, 3=绝对
++-G gamma-file.ps  将 gamma 文件前置到 Postscript 输入中，
++                  使用 setcolortransfer PS 操作符进行颜色校正。
++
++调试选项:
++-S plane          仅输出彩色打印中的单个颜色平面 [全部]
++                  1=青色, 2=品红, 3=黄色, 4=黑色
++-D lvl            设置调试级别 [$DEBUG]
+ -V                $VERSION
+ EOF
+ 
+diff --git a/foo2hbpl2.c b/foo2hbpl2.c
+index 3f8d267..8fcd0db 100644
+--- a/foo2hbpl2.c
++++ b/foo2hbpl2.c
+@@ -151,71 +151,70 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"   foo2hbpl2 [options] <pbmraw-file >hbpl-file\n"
++"使用方式:\n"
++"   foo2hbpl2 [选项] <pbmraw文件 >hbpl文件\n"
+ "\n"
+-"	Convert Ghostscript pbmraw format to a monochrome ZJS stream,\n"
+-"	for driving the Dell 1355 and Xerox WorkCentre 6015 MFP printers.\n"
++"	将Ghostscript pbmraw格式转换为单色ZJS打印数据流，\n"
++"	适用于戴尔 1355 以及施乐 WorkCentre 6015 MFP 一体机。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"		-sPAPERSIZE=letter -r1200x600 -sDEVICE=pbmraw \\ \n"
+-"		-sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"		-sPAPERSIZE=letter -r1200x600 -sDEVICE=pbmraw \\\n"
++"		-sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2hbpl2 -r1200x600 -g10200x6600 -p1 >testpage.zm\n"
+ "\n"
+-"   foo2hbpl2 [options] <bitcmyk-file >hbpl-file\n"
+-"   foo2hbpl2 [options] <pksmraw-file >hbpl-file\n"
++"   foo2hbpl2 [选项] <bitcmyk文件 >hbpl文件\n"
++"   foo2hbpl2 [选项] <pksmraw文件 >hbpl文件\n"
+ "\n"
+-"	Convert Ghostscript bitcmyk or pksmraw format to a color ZJS stream,\n"
+-"	for driving Dell 1355 and Xerox WorkCentre 6015 MFP printers.\n"
+-"	N.B. Color correction is expected to be performed by ghostscript.\n"
++"	将Ghostscript bitcmyk 或 pksmraw格式转换为彩色ZJS打印数据流，\n"
++"	适用于戴尔 1355 以及施乐 WorkCentre 6015 MFP 一体机。\n"
++"	注意：色彩校正工作由Ghostscript完成。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"	    -sPAPERSIZE=letter -g10200x6600 -r1200x600 -sDEVICE=bitcmyk \\ \n"
+-"	    -sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"	    -sPAPERSIZE=letter -g10200x6600 -r1200x600 -sDEVICE=bitcmyk \\\n"
++"	    -sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2hbpl2 -r1200x600 -g10200x6600 -p1 >testpage.zc\n"
+ "\n"
+-"Normal Options:\n"
+-"-c                Force color mode if autodetect doesn't work\n"
+-"-d duplex         Duplex code to send to printer [%d]\n"
+-"                    1=off, 2=longedge, 3=shortedge\n"
+-"                    4=manual longedge, 5=manual shortedge\n"
+-"-g <xpix>x<ypix>  Set page dimensions in pixels [%dx%d]\n"
+-"-m media          Media code to send to printer [%d]\n"
+-"                    1=plain, 2=bond, 3=lwcard, 4=lwgcard, 5=labels,\n"
+-"                    6=envelope, 7=recycled, 8=plain2, 9=bond2,\n"
+-"                    10=lwcard2, 11=lwgcard2, 12=recycled2\n"
+-"-p paper          Paper code to send to printer [%d]\n"
+-"                    1=A4, 2=B5, 3=A5, 4=letter, 5=executive,\n"
+-"                    6=fanfoldgermanlegal/folio, 7=legal, 9=env#10,\n"
+-"                    10=envMonarch, 11=envC5, 12=envDL\n"
+-"-n copies         Number of copies [%d]\n"
+-"-r <xres>x<yres>  Set device resolution in pixels/inch [%dx%d]\n"
+-"-s source         Source code to send to printer [%d]\n"
+-"                    1=upper 2=lower 4=manual 7=auto\n"
+-"                    Code numbers may vary with printer model\n"
+-"-t                Draft mode.  Every other pixel is white.\n"
+-// "-T density        Print density (1-5) [%d].\n"
+-"-J filename       Filename string to send to printer [%s]\n"
+-"-U username       Username string to send to printer [%s]\n"
++"常规选项:\n"
++"-c                自动检测失效时强制启用彩色模式\n"
++"-d duplex         下发至打印机的双面打印代码 [%d]\n"
++"                    1=关闭，2=长边翻转，3=短边翻转\n"
++"                    4=手动长边翻转，5=手动短边翻转\n"
++"-g <xpix>x<ypix>  设置页面尺寸，单位像素 [%dx%d]\n"
++"-m media          打印介质代码 [%d]\n"
++"                    1=普通纸，2=证券纸，3=轻卡纸，4=重磅轻卡纸，5=标签纸，\n"
++"                    6=信封，7=再生纸，8=普通纸2，9=证券纸2，\n"
++"                    10=轻卡纸2，11=重磅轻卡纸2，12=再生纸2\n"
++"-p paper          纸张规格代码 [%d]\n"
++"                    1=A4，2=B5，3=A5，4=Letter，5=Executive，\n"
++"                    6=德国折页Legal/Folio，7=Legal，9=10号信封，\n"
++"                    10=Monarch信封，11=C5信封，12=DL信封\n"
++"-n copies         打印份数 [%d]\n"
++"-r <xres>x<yres>  设置打印分辨率（像素/英寸）[%dx%d]\n"
++"-s source         进纸来源代码 [%d]\n"
++"                    1=上层纸盒，2=下层纸盒，4=手动进纸，7=自动选择\n"
++"                    代码编号随打印机型号有所差异\n"
++"-t                草稿模式，隔像素留白\n"
++// "-T density        打印浓度（取值1-5）[%d].\n"
++"-J filename       发送至打印机的文件名 [%s]\n"
++"-U username       发送至打印机的用户名 [%s]\n"
+ "\n"
+-"Printer Tweaking Options:\n"
+-"-u <xoff>x<yoff>  Set offset of upper left printable in pixels [%dx%d]\n"
+-"-l <xoff>x<yoff>  Set offset of lower right printable in pixels [%dx%d]\n"
+-"-L mask           Send logical clipping values from -u/-l in ZjStream [%d]\n"
+-"                  0=no, 1=Y, 2=X, 3=XY\n"
+-"-A                AllIsBlack: convert C=1,M=1,Y=1 to just K=1\n"
+-"-B                BlackClears: K=1 forces C,M,Y to 0\n"
+-"                  -A, -B work with bitcmyk input only\n"
+-"-P                Do not output START_PLANE codes.  May be needed by some\n"
+-"                  some black and white only printers.\n"
+-"-X padlen         Add extra zero padding to the end of BID segments [%d]\n"
+-// "-z model          Model: [%d]\n"
++"打印机微调选项:\n"
++"-u <xoff>x<yoff>  左上角可打印区域偏移量（像素）[%dx%d]\n"
++"-l <xoff>x<yoff>  右下角可打印区域偏移量（像素）[%dx%d]\n"
++"-L mask           在ZjStream数据流中启用 -u/-l 逻辑裁切参数 [%d]\n"
++"                  0=禁用，1=Y轴裁切，2=X轴裁切，3=XY轴裁切\n"
++"-A                全黑优化：C=1,M=1,Y=1统一转换为K=1\n"
++"-B                黑色清除：K通道为1时强制清空C/M/Y通道\n"
++"                  -A、-B 仅对bitcmyk输入生效\n"
++"-P                不输出START_PLANE指令，部分单色打印机需要此参数\n"
++"-X padlen         在BID数据段末尾追加零填充字节 [%d]\n"
++// "-z model          指定机型：[%d]\n"
+ "\n"
+-"Debugging Options:\n"
+-"-S plane          Output just a single color plane from a color print [all]\n"
+-"                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black\n"
+-"-D lvl            Set Debug level [%d]\n"
+-"-V                Version %s\n"
++"调试选项:\n"
++"-S plane          仅输出彩色打印单一色版 [默认输出全部色版]\n"
++"                  1=青色(C)，2=品红(M)，3=黄色(Y)，4=黑色(K)\n"
++"-D lvl            设置调试等级 [%d]\n"
++"-V                版本 %s\n"
+     , Duplex
+     , PageWidth , PageHeight
+     , MediaCode
+diff --git a/foo2hiperc-wrapper.in b/foo2hiperc-wrapper.in
+index adcc98d..c1e9dc4 100755
+--- a/foo2hiperc-wrapper.in
++++ b/foo2hiperc-wrapper.in
+@@ -54,63 +54,62 @@ fi
+ 
+ usage() {
+ 	cat <<EOF
+-Usage:
+-	$BASENAME [options] [ps-file]
++用法:
++	$BASENAME [选项] [ps文件]
+ 
+-	Foomatic printer wrapper for the foo2hiperc printer driver.
+-	This script reads a Postscript ps-file or standard input
+-	and converts it to a Oki Data HIPERC stream for the
++	foo2hiperc 打印机驱动的 Foomatic 包装脚本。
++	此脚本读取 Postscript 文件或标准输入，
++	并将其转换为 Oki Data HIPERC 数据流，适用于
+ 	C310/C3100/C3200/C3250/C3400/C5100/C5250n/C5500/C5600/C5800
+-	printers.
+-
+-Normal Options:
+--c                Print in color (else monochrome)
+--C colormode      Colormode [$COLORMODE]
+-                    10=ICM color profile (using -G *.icm file)
+--d duplex         Duplex code to send to printer [$DUPLEX]
+-                    1=off, 2=longedge, 3=shortedge
+--m media          Media code to send to printer [$MEDIA]
+-                    0=plain 1=labels 2=transparency
+--p paper          Paper code [$PAPER]
+-                    1=A4, 2=letter, 3=legal, 5=A5, 6=B5, 7=A6, 8=envMonarch,
+-                    9=envDL, 10=envC5, 11=env#10, 12=executive, 13=env#9,
+-                    14=legal135, 15=A3, 16=tabloid/ledger
+--n copies         Number of copies [$COPIES]
+--r <xres>x<yres>  Set device resolution in pixels/inch [$RES]
+--s source         Source code to send to printer [$SOURCE]
+-                    0=auto 1=tray1 2=tray2 3=multi 4=manual
+-		    Code numbers may vary with printer model.
+--t                Draft mode.  Every other pixel is white.
++	打印机。
++
++普通选项:
++-c                彩色打印（否则为黑白）
++-C colormode      颜色模式 [$COLORMODE]
++                    10=ICM 色彩配置文件（使用 -G *.icm 文件）
++-d duplex         向打印机发送的双面打印代码 [$DUPLEX]
++                    1=关闭, 2=长边翻转, 3=短边翻转
++-m media          向打印机发送的介质代码 [$MEDIA]
++                    0=普通纸 1=标签 2=透明胶片
++-p paper          向打印机发送的纸张代码 [$PAPER]
++                    1=A4, 2=Letter, 3=Legal, 5=A5, 6=B5, 7=A6, 8=信封Monarch,
++                    9=信封DL, 10=信封C5, 11=信封#10, 12=Executive, 13=信封#9,
++                    14=Legal(13英寸), 15=A3, 16=Tabloid/Ledger
++-n copies         打印份数 [$COPIES]
++-r <xres>x<yres>  设置设备分辨率（像素/英寸）[$RES]
++-s source         向打印机发送的纸盒来源代码 [$SOURCE]
++                    0=自动 1=纸盒1 2=纸盒2 3=多功能纸盒 4=手动
++		    代码可能因打印机型号而异
++-t                草稿模式（每隔一个像素变白）
+ -2/-3/-4/-6/-8/-10/-12/-14/-15/-16/-18
+-                  Print with N-up (requires psutils)
+--o orient         For N-up: -op is portrait, -ol is landscape, -os is seascape.
+-
+-Printer Tweaking Options:
+--u <xoff>x<yoff>  Set offset of upper left printable in pixels [varies]
+--l <xoff>x<yoff>  Set offset of lower right printable in pixels [varies]
+--L mask           Send logical clipping values from -u/-l in ZjStream [3]
+-                  0=no, 1=Y, 2=X, 3=XY
+--P                Do not output START_PLANE codes.  May be needed by some
+-                  monochrome-only printers.
+--X padlen         Add extra zero padding to the end of BID segments [16]
+--z model          Model: 0=no A3 (usual), 1=A3 (C810 etc.) [$MODEL]
+--Z compressed     Use uncompressed (0) or compressed (1) data [0]
+-
+-Color Tweaking Options:
+--g gsopts         Additional options to pass to Ghostscript, such as
+-                  -dDITHERPPI=nnn, etc.  May appear more than once. []
+--G profile.icm    Convert profile.icm to a Postscript CRD using icc2ps and
+-                  adjust colors using the setcolorrendering PS operator.
+-                  $SHARE/icm/ will be searched for profile.icm.
+--I intent         Select profile intent from ICM file [$INTENT]
+-                  0=Perceptual, 1=Colorimetric, 2=Saturation, 3=Absolute
+--G gamma-file.ps  Prepend gamma-file to the Postscript input to perform
+-                  color correction using the setcolortransfer PS operator.
+-
+-Debugging Options:
+--S plane          Output just a single color plane from a color print [all]
+-                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black
+--D lvl            Set Debug level [$DEBUG]
++                  多页打印（需要 psutils）
++-o orient         多页打印方向：-op 纵向, -ol 横向, -os 倒置横向
++
++打印机调整选项:
++-u <xoff>x<yoff>  设置左上角可打印区域偏移量（像素）[可变]
++-l <xoff>x<yoff>  设置右下角可打印区域偏移量（像素）[可变]
++-L mask           在 ZjStream 中发送来自 -u/-l 的逻辑裁剪值 [3]
++                  0=禁用, 1=Y轴, 2=X轴, 3=XY轴
++-P                不输出 START_PLANE 代码。部分单色打印机可能需要此选项
++-X padlen         在 BID 段末尾添加额外的零填充 [16]
++-z model          机型: 0=不支持 A3（常规）, 1=支持 A3（如 C810 等）[$MODEL]
++-Z compressed     使用未压缩（0）或压缩（1）数据 [0]
++
++色彩调整选项:
++-g gsopts         传递给 Ghostscript 的额外选项，例如
++                  -dDITHERPPI=nnn 等，可多次出现 []
++-G profile.icm    使用 icc2ps 将 profile.icm 转换为 Postscript CRD，
++                  并使用 setcolorrendering PS 操作符调整颜色。
++                  会搜索 $SHARE/icm/ 目录中的 profile.icm。
++-I intent         从 ICM 文件中选择配置意图 [$INTENT]
++                  0=感知, 1=色度, 2=饱和度, 3=绝对
++-G gamma-file.ps  将 gamma 文件前置到 Postscript 输入中，
++                  使用 setcolortransfer PS 操作符进行颜色校正。
++
++调试选项:
++-S plane          仅输出彩色打印中的单个颜色平面 [全部]
++                  1=青色, 2=品红, 3=黄色, 4=黑色
++-D lvl            设置调试级别 [$DEBUG]
+ -V                $VERSION
+ EOF
+ 
+diff --git a/foo2hiperc.c b/foo2hiperc.c
+index 509028c..b2f0f03 100644
+--- a/foo2hiperc.c
++++ b/foo2hiperc.c
+@@ -133,67 +133,66 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"   foo2hiperc [options] <pbmraw-file >hiperc-file\n"
++"使用方式:\n"
++"   foo2hiperc [选项] <pbmraw文件 >hiperc文件\n"
+ "\n"
+-"	Convert Ghostscript pbmraw format to a monochrome HIPERC stream,\n"
+-"	for driving the Oki C310, C3100 to C5800 color laser printers.\n"
++"	将Ghostscript pbmraw格式转换为单色HIPERC打印数据流，\n"
++"	适用于冲电气 Oki C310、C3100 ~ C5800 系列彩色激光打印机。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"		-sPAPERSIZE=letter -r600x600 -sDEVICE=pbmraw \\ \n"
+-"		-sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"		-sPAPERSIZE=letter -r600x600 -sDEVICE=pbmraw \\\n"
++"		-sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2hiperc -r600x600 -g5100x6600 -p1 >testpage.zm\n"
+ "\n"
+-"   foo2hiperc [options] <bitcmyk-file >hiperc-file\n"
+-"   foo2hiperc [options] <pksmraw-file >hiperc-file\n"
++"   foo2hiperc [选项] <bitcmyk文件 >hiperc文件\n"
++"   foo2hiperc [选项] <pksmraw文件 >hiperc文件\n"
+ "\n"
+-"	Convert Ghostscript bitcmyk or pksmraw format to a color HIPERC stream,\n"
+-"	for driving the Oki C310, C3100 to C5800 color laser printers\n"
+-"	N.B. Color correction is expected to be performed by ghostscript.\n"
++"	将Ghostscript bitcmyk 或 pksmraw格式转换为彩色HIPERC打印数据流，\n"
++"	适用于冲电气 Oki C310、C3100 ~ C5800 系列彩色激光打印机。\n"
++"	注意：色彩校正工作由Ghostscript完成。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"	    -sPAPERSIZE=letter -g5100x6600 -r600x600 -sDEVICE=bitcmyk \\ \n"
+-"	    -sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"	    -sPAPERSIZE=letter -g5100x6600 -r600x600 -sDEVICE=bitcmyk \\\n"
++"	    -sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2hiperc -r600x600 -g5100x6600 -p1 >testpage.zc\n"
+ "\n"
+-"Normal Options:\n"
+-"-c                Force color mode if autodetect doesn't work\n"
+-"-d duplex         Duplex code to send to printer [%d]\n"
+-"                    1=off, 2=longedge, 3=shortedge\n"
+-"-g <xpix>x<ypix>  Set page dimensions in pixels [%dx%d]\n"
+-"-m media          Media code to send to printer [%d]\n"
+-"                    0=plain 1=labels 2=transparency\n"
+-"-p paper          Paper code to send to printer [%d]\n"
+-"                    1=A4, 2=letter, 3=legal, 5=A5, 6=B5, 7=A6, 8=envMonarch,\n"
+-"                    9=envDL, 10=envC5, 11=env#10, 12=executive, 13=env#9,\n"
+-"                    14=legal135, 15=A3, 16=tabloid/ledger\n"
+-"-n copies         Number of copies [%d]\n"
+-"-r <xres>x<yres>  Set device resolution in pixels/inch [%dx%d]\n"
+-"-s source         Source code to send to printer [%d]\n"
+-"                    0=auto 1=tray1 2=tray2 3=multi 4=manual\n"
+-"                    Code numbers may vary with printer model\n"
+-"-t                Draft mode.  Every other pixel is white.\n"
+-"-J filename       Filename string to send to printer [%s]\n"
+-"-U username       Username string to send to printer [%s]\n"
++"常规选项:\n"
++"-c                自动检测失效时强制启用彩色模式\n"
++"-d duplex         下发至打印机的双面打印代码 [%d]\n"
++"                    1=关闭，2=长边翻转，3=短边翻转\n"
++"-g <xpix>x<ypix>  设置页面尺寸，单位像素 [%dx%d]\n"
++"-m media          打印介质代码 [%d]\n"
++"                    0=普通纸，1=标签纸，2=透明胶片\n"
++"-p paper          纸张规格代码 [%d]\n"
++"                    1=A4，2=Letter，3=Legal，5=A5，6=B5，7=A6，8=Monarch信封，\n"
++"                    9=DL信封，10=C5信封，11=10号信封，12=Executive，13=9号信封，\n"
++"                    14=13.5英寸Legal，15=A3，16=Tabloid/Ledger\n"
++"-n copies         打印份数 [%d]\n"
++"-r <xres>x<yres>  设置打印分辨率（像素/英寸）[%dx%d]\n"
++"-s source         进纸来源代码 [%d]\n"
++"                    0=自动选择，1=纸盒1，2=纸盒2，3=多功能纸盒，4=手动进纸\n"
++"                    代码编号随打印机型号有所差异\n"
++"-t                草稿模式，隔像素留白\n"
++"-J filename       发送至打印机的文件名 [%s]\n"
++"-U username       发送至打印机的用户名 [%s]\n"
+ "\n"
+-"Printer Tweaking Options:\n"
+-"-u <xoff>x<yoff>  Set offset of upper left printable in pixels [%dx%d]\n"
+-"-l <xoff>x<yoff>  Set offset of lower right printable in pixels [%dx%d]\n"
+-"-L mask           Send logical clipping values from -u/-l in ZjStream [%d]\n"
+-"                  0=no, 1=Y, 2=X, 3=XY\n"
+-"-A                AllIsBlack: convert C=1,M=1,Y=1 to just K=1\n"
+-"-B                BlackClears: K=1 forces C,M,Y to 0\n"
+-"                  -A, -B work with bitcmyk input only\n"
+-"-P                Do not output START_PLANE codes.  May be needed by some\n"
+-"                  some black and white only printers.\n"
+-"-X padlen         Add extra zero padding to the end of BID segments [%d]\n"
+-"-Z compressed     Use uncompressed (0) or compressed (1) data [%d]\n"
++"打印机微调选项:\n"
++"-u <xoff>x<yoff>  左上角可打印区域偏移量（像素）[%dx%d]\n"
++"-l <xoff>x<yoff>  右下角可打印区域偏移量（像素）[%dx%d]\n"
++"-L mask           在ZjStream数据流中启用 -u/-l 逻辑裁切参数 [%d]\n"
++"                  0=禁用，1=Y轴裁切，2=X轴裁切，3=XY轴裁切\n"
++"-A                全黑优化：C=1,M=1,Y=1统一转换为K=1\n"
++"-B                黑色清除：K通道为1时强制清空C/M/Y通道\n"
++"                  -A、-B 仅对bitcmyk输入生效\n"
++"-P                不输出START_PLANE指令，部分单色打印机需要此参数\n"
++"-X padlen         在BID数据段末尾追加零填充字节 [%d]\n"
++"-Z compressed     数据压缩开关：0=不压缩，1=启用压缩 [%d]\n"
+ "\n"
+-"Debugging Options:\n"
+-"-S plane          Output just a single color plane from a color print [all]\n"
+-"                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black\n"
+-"-D lvl            Set Debug level [%d]\n"
+-"-V                Version %s\n"
++"调试选项:\n"
++"-S plane          仅输出彩色打印单一色版 [默认输出全部色版]\n"
++"                  1=青色(C)，2=品红(M)，3=黄色(Y)，4=黑色(K)\n"
++"-D lvl            设置调试等级 [%d]\n"
++"-V                版本 %s\n"
+     , Duplex
+     , PageWidth , PageHeight
+     , MediaCode
+diff --git a/foo2hp.c b/foo2hp.c
+index 297635d..851b03b 100644
+--- a/foo2hp.c
++++ b/foo2hp.c
+@@ -123,73 +123,72 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"   foo2hp [options] <pbmraw-file >zjs-file\n"
++"使用方式:\n"
++"   foo2hp [选项] <pbmraw文件 >zjs文件\n"
+ "\n"
+-"	Convert Ghostscript pbmraw format to a monochrome ZJS stream,\n"
+-"	for driving the Hewlett-Packard 2600n color laser printer\n"
+-"	and other Zenographics-based black and white printers.\n"
++"	将Ghostscript pbmraw格式转换为单色ZJS打印数据流，\n"
++"	适用于惠普 2600n 彩色激光打印机\n"
++"	以及其他基于Zenographics协议的黑白打印机。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"		-sPAPERSIZE=letter -r600x600 -sDEVICE=pbmraw \\ \n"
+-"		-sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"		-sPAPERSIZE=letter -r600x600 -sDEVICE=pbmraw \\\n"
++"		-sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2hp -r600x600 -g5100x6600 -p1 >testpage.zm\n"
+ "\n"
+-"   foo2hp [options] <bitcmyk-file >zjs-file\n"
+-"   foo2hp [options] <cups-file >zjs-file\n"
++"   foo2hp [选项] <bitcmyk文件 >zjs文件\n"
++"   foo2hp [选项] <cups文件 >zjs文件\n"
+ "\n"
+-"	Convert Ghostscript bitcmyk or cups format to a color ZJS stream,\n"
+-"	for driving the Hewlett-Packard 2600n color laser printer\n"
+-"	N.B. Color correction is expected to be performed by ghostscript.\n"
++"	将Ghostscript bitcmyk 或 cups格式转换为彩色ZJS打印数据流，\n"
++"	适用于惠普 2600n 彩色激光打印机。\n"
++"	注意：色彩校正工作由Ghostscript完成。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"	    -sPAPERSIZE=letter -g5100x6600 -r600x600 -sDEVICE=bitcmyk \\ \n"
+-"	    -sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"	    -sPAPERSIZE=letter -g5100x6600 -r600x600 -sDEVICE=bitcmyk \\\n"
++"	    -sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2hp -r600x600 -g5100x6600 -p1 >testpage.zc\n"
+ "\n"
+-"Normal Options:\n"
+-"-b bits           Bits per plane if autodetect doesn't work (1 or 2) [%d]\n"
+-"-c                Force color mode if autodetect doesn't work\n"
+-"-d duplex         Duplex code to send to printer [%d]\n"
+-"                    1=off, 2=longedge, 3=shortedge,\n"
+-//"                    4=manual longedge, 5=manual shortedge\n"
+-"-g <xpix>x<ypix>  Set page dimensions in pixels [%dx%d]\n"
+-"-m media          Media code to send to printer [%d]\n"
+-"		     1=plain 514=preprinted 513=letterhead 2=transparency\n"
+-"                    515=prepunched 265=labels 260=bond 516=recycled\n"
+-"                    512=color 276=tough 267=envelope 258=light 262=heavy\n"
+-"                    261=cardstock 268=lightglossy 269=glossy\n"
+-"                    270=heavyglossy 277=cover 278=photo\n"
+-"-p paper          Paper code to send to printer [%d]\n"
+-"                    1=letter, 5=legal 7=executive 9=A4 11=A5 13=B5jis\n"
+-"                    20=env#10, 27=envDL 28=envC5 34=envB5 37=envMonarch\n"
+-"-n copies         Number of copies [%d]\n"
+-"-r <xres>x<yres>  Set device resolution in pixels/inch [%dx%d]\n"
+-"-s source         Source code to send to printer [%d]\n"
+-"                    1=tray2 2=tray1 7=auto\n"
+-"                    Code numbers may vary with printer model\n"
+-"-t                Draft mode.  Every other pixel is white.\n"
+-"-J filename       Filename string to send to printer [%s]\n"
+-"-U username       Username string to send to printer [%s]\n"
++"常规选项:\n"
++"-b bits           自动识别失效时指定单通道位深度（1 或 2）[%d]\n"
++"-c                自动检测失效时强制启用彩色模式\n"
++"-d duplex         下发至打印机的双面打印代码 [%d]\n"
++"                    1=关闭，2=长边翻转，3=短边翻转，\n"
++//"                    4=手动长边翻转，5=手动短边翻转\n"
++"-g <xpix>x<ypix>  设置页面尺寸，单位像素 [%dx%d]\n"
++"-m media          打印介质代码 [%d]\n"
++"		     1=普通纸，514=预印纸，513=信头纸，2=透明胶片\n"
++"                    515=预打孔纸，265=标签纸，260=证券纸，516=再生纸\n"
++"                    512=彩色纸，276=韧性纸，267=信封，258=轻量纸，262=厚纸\n"
++"                    261=卡纸，268=轻量高光纸，269=高光纸\n"
++"                    270=加厚高光纸，277=封皮纸，278=相纸\n"
++"-p paper          纸张规格代码 [%d]\n"
++"                    1=Letter，5=Legal，7=Executive，9=A4，11=A5，13=JIS B5\n"
++"                    20=10号信封，27=DL信封，28=C5信封，34=B5信封，37=Monarch信封\n"
++"-n copies         打印份数 [%d]\n"
++"-r <xres>x<yres>  设置打印分辨率（像素/英寸）[%dx%d]\n"
++"-s source         进纸来源代码 [%d]\n"
++"                    1=纸盒2，2=纸盒1，7=自动选择\n"
++"                    代码编号随打印机型号有所差异\n"
++"-t                草稿模式，隔像素留白\n"
++"-J filename       发送至打印机的文件名 [%s]\n"
++"-U username       发送至打印机的用户名 [%s]\n"
+ "\n"
+-"Printer Tweaking Options:\n"
+-"-u <xoff>x<yoff>  Set offset of upper left printable in pixels [%dx%d]\n"
+-"-l <xoff>x<yoff>  Set offset of lower right printable in pixels [%dx%d]\n"
+-"-L mask           Send logical clipping values from -u/-l in ZjStream [%d]\n"
+-"                  0=no, 1=Y, 2=X, 3=XY\n"
+-"-A                AllIsBlack: convert C=1,M=1,Y=1 to just K=1\n"
+-"-B                BlackClears: K=1 forces C,M,Y to 0\n"
+-"                  -A, -B work with bitcmyk input only\n"
+-"-O c,m,y,k        Alignment of CMYK in rows [%d,%d,%d,%d]\n"
+-"-P                Do not output START_PLANE codes.  May be needed by some\n"
+-"                  some black and white only printers.\n"
+-"-X padlen         Add extra zero padding to the end of BID segments [%d]\n"
++"打印机微调选项:\n"
++"-u <xoff>x<yoff>  左上角可打印区域偏移量（像素）[%dx%d]\n"
++"-l <xoff>x<yoff>  右下角可打印区域偏移量（像素）[%dx%d]\n"
++"-L mask           在ZjStream数据流中启用 -u/-l 逻辑裁切参数 [%d]\n"
++"                  0=禁用，1=Y轴裁切，2=X轴裁切，3=XY轴裁切\n"
++"-A                全黑优化：C=1,M=1,Y=1统一转换为K=1\n"
++"-B                黑色清除：K通道为1时强制清空C/M/Y通道\n"
++"                  -A、-B 仅对bitcmyk输入生效\n"
++"-O c,m,y,k        CMYK色彩通道对位调整，单位像素行 [%d,%d,%d,%d]\n"
++"-P                不输出START_PLANE指令，部分单色打印机需要此参数\n"
++"-X padlen         在BID数据段末尾追加零填充字节 [%d]\n"
+ "\n"
+-"Debugging Options:\n"
+-"-S plane          Output just a single color plane from a color print [all]\n"
+-"                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black\n"
+-"-D lvl            Set Debug level [%d]\n"
+-"-V                Version %s\n"
++"调试选项:\n"
++"-S plane          仅输出彩色打印单一色版 [默认输出全部色版]\n"
++"                  1=青色(C)，2=品红(M)，3=黄色(Y)，4=黑色(K)\n"
++"-D lvl            设置调试等级 [%d]\n"
++"-V                版本 %s\n"
+     , Bpp
+     , Duplex
+     , PageWidth , PageHeight
+@@ -209,6 +208,7 @@ usage(void)
+     , Version
+     );
+ 
++
+   exit(1);
+ }
+ 
+diff --git a/foo2hp2600-wrapper.in b/foo2hp2600-wrapper.in
+index c63e183..f0633e9 100755
+--- a/foo2hp2600-wrapper.in
++++ b/foo2hp2600-wrapper.in
+@@ -43,60 +43,59 @@ fi
+ 
+ usage() {
+ 	cat <<EOF
+-Usage:
+-	$BASENAME [options] [ps-file]
+-
+-	Foomatic printer wrapper for the foo2hp2600 printer driver.
+-	This script reads a Postscript ps-file or standard input
+-	and converts it to Zenographics ZjStream printer format.
+-
+-Normal Options:
+--b bits           Bits per plane (1 or 2) [$BPP]
+--c                Print in color (else monochrome)
+--d duplex         Duplex code to send to printer [$DUPLEX]
+-                    1=off, 2=longedge, 3=shortedge
+--m media          Media code to send to printer [$MEDIA]
+-                    1=standard, 2=transparency, 3=glossy, 257=envelope,
+-                    259=letterhead, 261=thickstock, 262=postcard, 263=labels
+--p paper          Paper code [$PAPER]
+-                    1=letter, 5=legal, 7=executive, 9=A4, 11=A5, 13=B5
+-                    20=env#10, 27=envDL 28=envC5 34=envB5 37=envMonarch
+--n copies         Number of copies [$COPIES]
+--r <xres>x<yres>  Set device resolution in pixels/inch [$RES]
+--s source         Source code to send to printer [$SOURCE]
+-                    1=tray2, 2=tray3, 4=manual/tray1, 7=auto
+-		    Code numbers may vary with printer model.
+--t                Draft mode.  Every other pixel is white.
++用法:
++	$BASENAME [选项] [ps文件]
++
++	foo2hp2600 打印机驱动的 Foomatic 包装脚本。
++	此脚本读取 Postscript 文件或标准输入，
++	并将其转换为 Zenographics ZjStream 打印机格式。
++
++普通选项:
++-b bits           每平面位数（1 或 2）[$BPP]
++-c                彩色打印（否则为黑白）
++-d duplex         向打印机发送的双面打印代码 [$DUPLEX]
++                    1=关闭, 2=长边翻转, 3=短边翻转
++-m media          向打印机发送的介质代码 [$MEDIA]
++                    1=普通纸, 2=透明胶片, 3=铜版纸, 257=信封,
++                    259=信纸, 261=厚纸, 262=明信片, 263=标签
++-p paper          向打印机发送的纸张代码 [$PAPER]
++                    1=Letter, 5=Legal, 7=Executive, 9=A4, 11=A5, 13=B5
++                    20=信封#10, 27=信封DL, 28=信封C5, 34=信封B5, 37=信封Monarch
++-n copies         打印份数 [$COPIES]
++-r <xres>x<yres>  设置设备分辨率（像素/英寸）[$RES]
++-s source         向打印机发送的纸盒来源代码 [$SOURCE]
++                    1=纸盒2, 2=纸盒3, 4=手动/纸盒1, 7=自动
++		    代码可能因打印机型号而异
++-t                草稿模式（每隔一个像素变白）
+ -2/-3/-4/-6/-8/-10/-12/-14/-15/-16/-18
+-                  Print with N-up (requires psutils)
+--o orient         For N-up: -op is portrait, -ol is landscape, -os is seascape.
+-
+-Printer Tweaking Options:
+--u <xoff>x<yoff>  Set offset of upper left printable in pixels [varies]
+--l <xoff>x<yoff>  Set offset of lower right printable in pixels [varies]
+--L mask           Send logical clipping values from -u/-l in ZjStream [3]
+-                  0=no, 1=Y, 2=X, 3=XY
+--P                Do not output START_PLANE codes.  May be needed by some
+-                  monochrome-only printers.
+--X padlen         Add extra zero padding to the end of BID segments [16]
+--z model          Model: 0=HP CLJ 1600/2600n; 1=HP CLJ CP1215 [$MODEL]
+--O parm=val       Alignment of CMYK.  "parm" is c,m,y, or k. "val" is in rows. 
+-
+-Color Tweaking Options:
+--g gsopts         Additional options to pass to Ghostscript, such as
+-                  -dDITHERPPI=nnn, etc.  May appear more than once. []
+--G profile.icm    Convert profile.icm to a Postscript CRD using icc2ps and
+-                  adjust colors using the setcolorrendering PS operator.
+-                  $SHARE/icm/ will be searched for profile.icm.
+--I intent         Select profile intent from ICM file [$INTENT]
+-                  0=Perceptual, 1=Colorimetric, 2=Saturation, 3=Absolute
+--G gamma-file.ps  Prepend gamma-file to the Postscript input to perform
+-                  color correction using the setcolortransfer PS operator.
+-
+-Debugging Options:
+--S plane          Output just a single color plane from a color print [all]
+-                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black
+--D lvl            Set Debug level [$DEBUG]
++                  多页打印（需要 psutils）
++-o orient         多页打印方向：-op 纵向, -ol 横向, -os 倒置横向
++
++打印机调整选项:
++-u <xoff>x<yoff>  设置左上角可打印区域偏移量（像素）[可变]
++-l <xoff>x<yoff>  设置右下角可打印区域偏移量（像素）[可变]
++-L mask           在 ZjStream 中发送来自 -u/-l 的逻辑裁剪值 [3]
++                  0=禁用, 1=Y轴, 2=X轴, 3=XY轴
++-P                不输出 START_PLANE 代码。部分单色打印机可能需要此选项
++-X padlen         在 BID 段末尾添加额外的零填充 [16]
++-z model          机型: 0=HP CLJ 1600/2600n; 1=HP CLJ CP1215 [$MODEL]
++-O parm=val       CMYK 对齐调整。"parm" 为 c、m、y 或 k，"val" 为行数
++
++色彩调整选项:
++-g gsopts         传递给 Ghostscript 的额外选项，例如
++                  -dDITHERPPI=nnn 等，可多次出现 []
++-G profile.icm    使用 icc2ps 将 profile.icm 转换为 Postscript CRD，
++                  并使用 setcolorrendering PS 操作符调整颜色。
++                  会搜索 $SHARE/icm/ 目录中的 profile.icm。
++-I intent         从 ICM 文件中选择配置意图 [$INTENT]
++                  0=感知, 1=色度, 2=饱和度, 3=绝对
++-G gamma-file.ps  将 gamma 文件前置到 Postscript 输入中，
++                  使用 setcolortransfer PS 操作符进行颜色校正。
++
++调试选项:
++-S plane          仅输出彩色打印中的单个颜色平面 [全部]
++                  1=青色, 2=品红, 3=黄色, 4=黑色
++-D lvl            设置调试级别 [$DEBUG]
+ -V                $VERSION
+ EOF
+ 
+diff --git a/foo2lava-wrapper.in b/foo2lava-wrapper.in
+index 3f0ba6a..ba02cd7 100755
+--- a/foo2lava-wrapper.in
++++ b/foo2lava-wrapper.in
+@@ -52,63 +52,62 @@ fi
+ 
+ usage() {
+ 	cat <<EOF
+-Usage:
+-	$BASENAME [options] [ps-file]
+-
+-	Foomatic printer wrapper for the foo2lava printer driver.
+-	This script reads a Postscript ps-file or standard input
+-	and converts it to LAVAFLOW printer format.
+-
+-Normal Options:
+--c                Print in color (else monochrome)
+--C colormode      Colormode [$COLORMODE]
+-                    1=Photos, 2=Photo and text, 3=Graphics and text
+-                    10=ICM color profile (using -G *.icm file)
+--d duplex         Duplex code to send to printer [$DUPLEX]
+-                    1=off, 2=longedge, 3=shortedge
+--m media          Media code to send to printer [$MEDIA]
+-                    1=standard 4=transparency 20=thick stock 22=envelope
+-                    23=letterhead 25=postcard 26=labels 27=recycled
+-                    28=glossy
+--p paper          Paper code [$PAPER]
+-                    1=executive 2=letter 3=legal 25=A5 26=A4 45=B5jis
+-                    65=B5iso 80=envMonarch 81=env#10 90=envDL 91=envC5
+-                    92=envC6 835=4x6\" 837=10x15cm
+--n copies         Number of copies [$COPIES]
+--r <xres>x<yres>  Set device resolution in pixels/inch [$RES]
+--s source         Source code to send to printer [$SOURCE]
+-                    1=upper, 2=lower, 4=manual, 7=auto
+-		    Code numbers may vary with printer model.
+--t                Draft mode.  Every other pixel is white.
++用法:
++	$BASENAME [选项] [ps文件]
++
++	foo2lava 打印机驱动的 Foomatic 包装脚本。
++	此脚本读取 Postscript 文件或标准输入，
++	并将其转换为 LAVAFLOW 打印机格式。
++
++普通选项:
++-c                彩色打印（否则为黑白）
++-C colormode      颜色模式 [$COLORMODE]
++                    1=照片, 2=照片和文本, 3=图形和文本
++                    10=ICM 色彩配置文件（使用 -G *.icm 文件）
++-d duplex         向打印机发送的双面打印代码 [$DUPLEX]
++                    1=关闭, 2=长边翻转, 3=短边翻转
++-m media          向打印机发送的介质代码 [$MEDIA]
++                    1=普通纸 4=透明胶片 20=厚纸 22=信封
++                    23=信纸 25=明信片 26=标签 27=再生纸
++                    28=铜版纸
++-p paper          向打印机发送的纸张代码 [$PAPER]
++                    1=Executive 2=Letter 3=Legal 25=A5 26=A4 45=B5(JIS)
++                    65=B5(ISO) 80=信封Monarch 81=信封#10 90=信封DL 91=信封C5
++                    92=信封C6 835=4x6英寸 837=10x15厘米
++-n copies         打印份数 [$COPIES]
++-r <xres>x<yres>  设置设备分辨率（像素/英寸）[$RES]
++-s source         向打印机发送的纸盒来源代码 [$SOURCE]
++                    1=上纸盒, 2=下纸盒, 4=手动, 7=自动
++		    代码可能因打印机型号而异
++-t                草稿模式（每隔一个像素变白）
+ -2/-3/-4/-6/-8/-10/-12/-14/-15/-16/-18
+-                  Print with N-up (requires psutils)
+--o orient         For N-up: -op is portrait, -ol is landscape, -os is seascape.
+-
+-Printer Tweaking Options:
+--u <xoff>x<yoff>  Set offset of upper left printable in pixels [varies]
+--l <xoff>x<yoff>  Set offset of lower right printable in pixels [varies]
+--L mask           Send logical clipping values from -u/-l in ZjStream [3]
+-                  0=no, 1=Y, 2=X, 3=XY
+--P                Do not output START_PLANE codes.  May be needed by some
+-                  monochrome-only printers.
+--X padlen         Add extra zero padding to the end of BID segments [16]
+--z model          Model: 0=2530DL or 2=1600W (LAVAFLOW) or 1=2480MF (OPL) [0]
+-
+-Color Tweaking Options:
+--g gsopts         Additional options to pass to Ghostscript, such as
+-                  -dDITHERPPI=nnn, etc.  May appear more than once. []
+--G profile.icm    Convert profile.icm to a Postscript CRD using icc2ps and
+-                  adjust colors using the setcolorrendering PS operator.
+-                  $SHARE/icm/ will be searched for profile.icm.
+--I intent         Select profile intent from ICM file [$INTENT]
+-                  0=Perceptual, 1=Colorimetric, 2=Saturation, 3=Absolute
+--G gamma-file.ps  Prepend gamma-file to the Postscript input to perform
+-                  color correction using the setcolortransfer PS operator.
+-
+-Debugging Options:
+--S plane          Output just a single color plane from a color print [all]
+-                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black
+--D lvl            Set Debug level [$DEBUG]
++                  多页打印（需要 psutils）
++-o orient         多页打印方向：-op 纵向, -ol 横向, -os 倒置横向
++
++打印机调整选项:
++-u <xoff>x<yoff>  设置左上角可打印区域偏移量（像素）[可变]
++-l <xoff>x<yoff>  设置右下角可打印区域偏移量（像素）[可变]
++-L mask           在 ZjStream 中发送来自 -u/-l 的逻辑裁剪值 [3]
++                  0=禁用, 1=Y轴, 2=X轴, 3=XY轴
++-P                不输出 START_PLANE 代码。部分单色打印机可能需要此选项
++-X padlen         在 BID 段末尾添加额外的零填充 [16]
++-z model          机型: 0=2530DL 或 2=1600W (LAVAFLOW) 或 1=2480MF (OPL) [0]
++
++色彩调整选项:
++-g gsopts         传递给 Ghostscript 的额外选项，例如
++                  -dDITHERPPI=nnn 等，可多次出现 []
++-G profile.icm    使用 icc2ps 将 profile.icm 转换为 Postscript CRD，
++                  并使用 setcolorrendering PS 操作符调整颜色。
++                  会搜索 $SHARE/icm/ 目录中的 profile.icm。
++-I intent         从 ICM 文件中选择配置意图 [$INTENT]
++                  0=感知, 1=色度, 2=饱和度, 3=绝对
++-G gamma-file.ps  将 gamma 文件前置到 Postscript 输入中，
++                  使用 setcolortransfer PS 操作符进行颜色校正。
++
++调试选项:
++-S plane          仅输出彩色打印中的单个颜色平面 [全部]
++                  1=青色, 2=品红, 3=黄色, 4=黑色
++-D lvl            设置调试级别 [$DEBUG]
+ -V                $VERSION
+ EOF
+ 
+diff --git a/foo2lava.c b/foo2lava.c
+index dbaef38..54f5ad0 100644
+--- a/foo2lava.c
++++ b/foo2lava.c
+@@ -162,72 +162,72 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"   foo2lava [options] <pbmraw-file >lava-file\n"
++"使用方式:\n"
++"   foo2lava [选项] <pbmraw文件 >lava文件\n"
+ "\n"
+-"	Convert Ghostscript pbmraw format to a monochrome LAVAFLOW stream,\n"
+-"	for driving the Konica Minolta magicolor 2530 DL network color laser\n"
+-"	printer and other LAVAFLOW-based black and white printers.\n"
++"	将Ghostscript pbmraw格式转换为单色LAVAFLOW打印数据流，\n"
++"	适用于柯尼卡美能达 magicolor 2530 DL 网络彩色激光打印机\n"
++"	以及其他基于LAVAFLOW协议的黑白打印机。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"		-sPAPERSIZE=letter -r1200x600 -sDEVICE=pbmraw \\ \n"
+-"		-sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"		-sPAPERSIZE=letter -r1200x600 -sDEVICE=pbmraw \\\n"
++"		-sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2lava -r1200x600 -g10200x6600 -p1 >testpage.zm\n"
+ "\n"
+-"   foo2lava [options] <bitcmyk-file >lava-file\n"
+-"   foo2lava [options] <pksmraw-file >lava-file\n"
++"   foo2lava [选项] <bitcmyk文件 >lava文件\n"
++"   foo2lava [选项] <pksmraw文件 >lava文件\n"
+ "\n"
+-"	Convert Ghostscript bitcmyk or pksmraw format to a color LAVAFLOW\n"
+-"	stream, for driving the Konica Minolta magicolor 2530 DL network\n"
+-"	color laser printer.\n"
+-"	N.B. Color correction is expected to be performed by ghostscript.\n"
++"	将Ghostscript bitcmyk 或 pksmraw格式转换为彩色LAVAFLOW\n"
++"	打印数据流，适用于柯尼卡美能达 magicolor 2530 DL 网络\n"
++"	彩色激光打印机。\n"
++"	注意：色彩校正工作由Ghostscript完成。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"	    -sPAPERSIZE=letter -g10200x6600 -r1200x600 -sDEVICE=bitcmyk \\ \n"
+-"	    -sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"	    -sPAPERSIZE=letter -g10200x6600 -r1200x600 -sDEVICE=bitcmyk \\\n"
++"	    -sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2lava -r1200x600 -g10200x6600 -p1 >testpage.zc\n"
+ "\n"
+-"Normal Options:\n"
+-"-c                Force color mode if autodetect doesn't work\n"
+-"-d duplex         Duplex code to send to printer [%d]\n"
+-"                    1=off, 2=longedge, 3=shortedge\n"
+-"                    4=manual longedge, 5=manual shortedge\n"
+-"-g <xpix>x<ypix>  Set page dimensions in pixels [%dx%d]\n"
+-"-m media          Media code to send to printer [%d]\n"
+-"                    1=standard 4=transparency 20=thick stock 22=envelope\n"
+-"                    23=letterhead 25=postcard 26=labels 27=recycled\n"
+-"                    28=glossy\n"
+-"-p paper          Paper code to send to printer [%d]\n"
+-"                    1=executive 2=letter 3=legal 25=A5 26=A4 45=B5jis\n"
+-"                    65=B5iso 80=envMonarch 81=env#10 90=envDL 91=envC5\n"
+-"                    92=envC6 835=4x6\" 837=10x15cm\n"
+-"-n copies         Number of copies [%d]\n"
+-"-r <xres>x<yres>  Set device resolution in pixels/inch [%dx%d]\n"
+-"-s source         Source code to send to printer [%d]\n"
+-"                    1=tray 1 (multipurpose) 4=tray 2 255=auto\n"
+-"                    Code numbers may vary with printer model\n"
+-"-t                Draft mode.  Every other pixel is white.\n"
+-"-J filename       Filename string to send to printer [%s]\n"
+-"-U username       Username string to send to printer [%s]\n"
++"常规选项:\n"
++"-c                自动检测失效时强制启用彩色模式\n"
++"-d duplex         下发至打印机的双面打印代码 [%d]\n"
++"                    1=关闭，2=长边翻转，3=短边翻转\n"
++"                    4=手动长边翻转，5=手动短边翻转\n"
++"-g <xpix>x<ypix>  设置页面尺寸，单位像素 [%dx%d]\n"
++"-m media          打印介质代码 [%d]\n"
++"                    1=普通纸，4=透明胶片，20=厚纸，22=信封\n"
++"                    23=信头纸，25=明信片，26=标签纸，27=再生纸\n"
++"                    28=高光纸\n"
++"-p paper          纸张规格代码 [%d]\n"
++"                    1=Executive，2=Letter，3=Legal，25=A5，26=A4，45=JIS B5\n"
++"                    65=ISO B5，80=Monarch信封，81=10号信封，90=DL信封，91=C5信封\n"
++"                    92=C6信封，835=4×6英寸相纸，837=10×15厘米相纸\n"
++"-n copies         打印份数 [%d]\n"
++"-r <xres>x<yres>  设置打印分辨率（像素/英寸）[%dx%d]\n"
++"-s source         进纸来源代码 [%d]\n"
++"                    1=1号纸盒（多功能纸盒），4=2号纸盒，255=自动选择\n"
++"                    代码编号随打印机型号有所差异\n"
++"-t                草稿模式，隔像素留白\n"
++"-J filename       发送至打印机的文件名 [%s]\n"
++"-U username       发送至打印机的用户名 [%s]\n"
+ "\n"
+-"Printer Tweaking Options:\n"
+-"-u <xoff>x<yoff>  Set offset of upper left printable in pixels [%dx%d]\n"
+-"-l <xoff>x<yoff>  Set offset of lower right printable in pixels [%dx%d]\n"
+-"-L mask           Send logical clipping values from -u/-l in ZjStream [%d]\n"
+-"                  0=no, 1=Y, 2=X, 3=XY\n"
+-"-A                AllIsBlack: convert C=1,M=1,Y=1 to just K=1\n"
+-"-B                BlackClears: K=1 forces C,M,Y to 0\n"
+-"                  -A, -B work with bitcmyk input only\n"
+-"-P                Do not output START_PLANE codes.  May be needed by some\n"
+-"                  some black and white only printers.\n"
+-"-X padlen         Add extra zero padding to the end of BID segments [%d]\n"
+-"-z model          Model: 0=2530DL, 2=1600W (LAVAFLOW), 1=2480MF (OPL) [%d]\n"
++"打印机微调选项:\n"
++"-u <xoff>x<yoff>  左上角可打印区域偏移量（像素）[%dx%d]\n"
++"-l <xoff>x<yoff>  右下角可打印区域偏移量（像素）[%dx%d]\n"
++"-L mask           在ZjStream数据流中启用 -u/-l 逻辑裁切参数 [%d]\n"
++"                  0=禁用，1=Y轴裁切，2=X轴裁切，3=XY轴裁切\n"
++"-A                全黑优化：C=1,M=1,Y=1统一转换为K=1\n"
++"-B                黑色清除：K通道为1时强制清空C/M/Y通道\n"
++"                  -A、-B 仅对bitcmyk输入生效\n"
++"-P                不输出START_PLANE指令，部分单色打印机需要此参数\n"
++"-X padlen         在BID数据段末尾追加零填充字节 [%d]\n"
++"-z model          指定机型 [%d]\n"
++"                    0=2530DL，2=1600W（LAVAFLOW协议），1=2480MF（OPL协议）\n"
+ "\n"
+-"Debugging Options:\n"
+-"-S plane          Output just a single color plane from a color print [all]\n"
+-"                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black\n"
+-"-D lvl            Set Debug level [%d]\n"
+-"-V                Version %s\n"
++"调试选项:\n"
++"-S plane          仅输出彩色打印单一色版 [默认输出全部色版]\n"
++"                  1=青色(C)，2=品红(M)，3=黄色(Y)，4=黑色(K)\n"
++"-D lvl            设置调试等级 [%d]\n"
++"-V                版本 %s\n"
+     , Duplex
+     , PageWidth , PageHeight
+     , MediaCode
+diff --git a/foo2oak-wrapper.in b/foo2oak-wrapper.in
+index 033eade..41a7700 100755
+--- a/foo2oak-wrapper.in
++++ b/foo2oak-wrapper.in
+@@ -44,59 +44,59 @@ fi
+ 
+ usage() {
+ 	cat <<EOF
+-Usage:
+-	$BASENAME [options] [ps-file]
+-
+-	Foomatic printer wrapper for the foo2oak printer driver.
+-	This script reads a Postscript ps-file or standard input
+-	and converts it to Oak Technoligies OAKT printer format.
+-
+-Normal Options:
+--b bits           Bits per plane (1 or 2) [$BPP]
+--c                Print in color (else monochrome)
+--d duplex         Duplex code to send to printer [$DUPLEX]
+-                    1=off, 2=longedge, 3=shortedge
+--m media          Media code to send to printer [$MEDIA]
+-                    0=auto 1=plain 2=preprinted 3=letterhead 4=graytrans
+-                    5=prepunched 6=labels 7=bond 8=recycled 9=color
+-                    10=cardstock 11=heavy 12=envelope 13=light 14=tough
+-		    15=vellum 16=rough 19=thick 20=highqual
+--p paper          Paper code [$PAPER]
+-                    1=letter, 3=ledger, 5=legal, 6=statement, 7=executive,
+-		    8=A3, 9=A4, 11=A5, 12=B4, 13=B5jis, 14=folio, 19=env9,
+-		    20=env10, 27=envDL, 28=envC5, 30=envC4, 37=envMonarch,
+-		    257=A6, 258=B6, 259=B5iso, 260=env6
+--n copies         Number of copies [$COPIES]
+--r <xres>x<yres>  Set device resolution in pixels/inch [$RES]
+--s source         Source code to send to printer [$SOURCE]
+-                    1=tray1, 2=tray2, 4=manual, 7=auto
+-		    Code numbers may vary with printer model.
++用法:
++	$BASENAME [选项] [ps文件]
++
++	foo2oak 打印机驱动的 Foomatic 包装脚本。
++	此脚本读取 Postscript 文件或标准输入，
++	并将其转换为 Oak Technologies OAKT 打印机格式。
++
++普通选项:
++-b bits           每平面位数（1 或 2）[$BPP]
++-c                彩色打印（否则为黑白）
++-d duplex         向打印机发送的双面打印代码 [$DUPLEX]
++                    1=关闭, 2=长边翻转, 3=短边翻转
++-m media          向打印机发送的介质代码 [$MEDIA]
++                    0=自动 1=普通纸 2=预印纸 3=信纸 4=灰色透明
++                    5=预打孔纸 6=标签 7=铜版纸 8=再生纸 9=彩色纸
++                    10=卡纸 11=厚纸 12=信封 13=薄纸 14=坚韧纸
++		    15=羊皮纸 16=粗糙纸 19=加厚纸 20=高质量纸
++-p paper          向打印机发送的纸张代码 [$PAPER]
++                    1=Letter, 3=帐簿, 5=Legal, 6=报表, 7=Executive,
++		    8=A3, 9=A4, 11=A5, 12=B4, 13=B5(JIS), 14=对开, 19=信封9号,
++		    20=信封10号, 27=信封DL, 28=信封C5, 30=信封C4, 37=信封Monarch,
++		    257=A6, 258=B6, 259=B5(ISO), 260=信封6号
++-n copies         打印份数 [$COPIES]
++-r <xres>x<yres>  设置设备分辨率（像素/英寸）[$RES]
++-s source         向打印机发送的纸盒来源代码 [$SOURCE]
++                    1=纸盒1, 2=纸盒2, 4=手动, 7=自动
++		    代码可能因打印机型号而异
+ -2/-3/-4/-6/-8/-10/-12/-14/-15/-16/-18
+-                  Print with N-up (requires psutils)
+--o orient         For N-up: -op is portrait, -ol is landscape, -os is seascape.
+-
+-Printer Tweaking Options:
+--u <xoff>x<yoff>  Set offset of upper left printable in pixels [varies]
+--l <xoff>x<yoff>  Set offset of lower right printable in pixels [varies]
+--L mask           Send logical clipping values from -u/-l in ZjStream [3]
+-                  0=no, 1=Y, 2=X, 3=XY
+--z model          Model: 0=HP CLJ 1500, 1=KM-1635/KM-2035 [$MODEL]
+-
+-Color Tweaking Options:
+--g gsopts         Additional options to pass to Ghostscript, such as
+-                  -dDITHERPPI=nnn, etc.  May appear more than once. []
+--G profile.icm    Convert profile.icm to a Postscript CRD using icc2ps and
+-                  adjust colors using the setcolorrendering PS operator.
+-                  $SHARE/icm/ will be searched for profile.icm.
+--I intent         Select profile intent from ICM file [$INTENT]
+-                  0=Perceptual, 1=Colorimetric, 2=Saturation, 3=Absolute
+--G gamma-file.ps  Prepend gamma-file to the Postscript input to perform
+-                  color correction using the setcolortransfer PS operator.
+-
+-Debugging Options:
+--S plane          Output just a single color plane from a color print [all]
+-                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black
+--D lvl            Set Debug level [$DEBUG]
++                  多页打印（需要 psutils）
++-o orient         多页打印方向：-op 纵向, -ol 横向, -os 倒置横向
++
++打印机调整选项:
++-u <xoff>x<yoff>  设置左上角可打印区域偏移量（像素）[可变]
++-l <xoff>x<yoff>  设置右下角可打印区域偏移量（像素）[可变]
++-L mask           在 ZjStream 中发送来自 -u/-l 的逻辑裁剪值 [3]
++                  0=禁用, 1=Y轴, 2=X轴, 3=XY轴
++-z model          机型: 0=HP CLJ 1500, 1=KM-1635/KM-2035 [$MODEL]
++
++色彩调整选项:
++-g gsopts         传递给 Ghostscript 的额外选项，例如
++                  -dDITHERPPI=nnn 等，可多次出现 []
++-G profile.icm    使用 icc2ps 将 profile.icm 转换为 Postscript CRD，
++                  并使用 setcolorrendering PS 操作符调整颜色。
++                  会搜索 $SHARE/icm/ 目录中的 profile.icm。
++-I intent         从 ICM 文件中选择配置意图 [$INTENT]
++                  0=感知, 1=色度, 2=饱和度, 3=绝对
++-G gamma-file.ps  将 gamma 文件前置到 Postscript 输入中，
++                  使用 setcolortransfer PS 操作符进行颜色校正。
++
++调试选项:
++-S plane          仅输出彩色打印中的单个颜色平面 [全部]
++                  1=青色, 2=品红, 3=黄色, 4=黑色
++-D lvl            设置调试级别 [$DEBUG]
+ -V                $VERSION
+ EOF
+ 
+diff --git a/foo2oak.c b/foo2oak.c
+index 0a40d1e..52e660e 100644
+--- a/foo2oak.c
++++ b/foo2oak.c
+@@ -135,81 +135,81 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"   foo2oak [options] <pbmraw-file >OAKT-file\n"
++"使用方式:\n"
++"   foo2oak [选项] <pbmraw文件 >OAKT文件\n"
+ "\n"
+-"	Convert Ghostscript pbm format to a 1-bpp monochrome OAKT stream,\n"
+-"	for driving the HP LaserJet 1500 color laser printer\n"
+-"	and other OAKT-based black and white printers.\n"
++"	将Ghostscript pbm格式转换为1位深度单色OAKT打印数据流，\n"
++"	适用于HP LaserJet 1500彩色激光打印机\n"
++"	以及其他基于OAKT协议的黑白打印机。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"		-sPAPERSIZE=letter -r600x600 -sDEVICE=pbmraw \\ \n"
+-"		-sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"		-sPAPERSIZE=letter -r600x600 -sDEVICE=pbmraw \\\n"
++"		-sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2oak -r600x600 -g5100x6600 -p1 >testpage.oak\n"
+ "\n"
+-"   foo2oak [options] <pgmraw-file >OAKT-file\n"
++"   foo2oak [选项] <pgmraw文件 >OAKT文件\n"
+ "\n"
+-"	Convert Ghostscript pgm format to a 2-bpp monochrome OAKT stream,\n"
+-"	for driving the HP LaserJet 1500 color laser printer\n"
+-"	and other OAKT-based black and white printers.\n"
++"	将Ghostscript pgm格式转换为2位深度单色OAKT打印数据流，\n"
++"	适用于HP LaserJet 1500彩色激光打印机\n"
++"	以及其他基于OAKT协议的黑白打印机。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"		-sPAPERSIZE=letter -r600x600 -sDEVICE=pgmraw \\ \n"
+-"		-sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"		-sPAPERSIZE=letter -r600x600 -sDEVICE=pgmraw \\\n"
++"		-sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2oak -r600x600 -g5100x6600 -p1 >testpage.oak\n"
+ "\n"
+-"   foo2oak [options] <bitcmyk-file >OAKT-file\n"
++"   foo2oak [选项] <bitcmyk文件 >OAKT文件\n"
+ "\n"
+-"	Convert Ghostscript bitcmyk format to a 1-bpp color OAKT stream,\n"
+-"	for driving the HP LaserJet 1500 color laser printer.\n"
+-"	N.B. Color correction is expected to be performed by ghostscript.\n"
++"	将Ghostscript bitcmyk格式转换为1位深度彩色OAKT打印数据流，\n"
++"	适用于HP LaserJet 1500彩色激光打印机。\n"
++"	注意：色彩校正工作由Ghostscript完成。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"	    -sPAPERSIZE=letter -g5100x6600 -r600x600 -sDEVICE=bitcmyk \\ \n"
+-"	    -sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"	    -sPAPERSIZE=letter -g5100x6600 -r600x600 -sDEVICE=bitcmyk \\\n"
++"	    -sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2oak -r600x600 -g5100x6600 -p1 >testpage.oak\n"
+ "\n"
+-"Normal Options:\n"
+-"-b bits           Bits per plane if autodetect doesn't work (1 or 2) [%d]\n"
+-"-c                Force color mode if autodetect doesn't work\n"
+-"-d duplex         Duplex code to send to printer [%d]\n"
+-"                    1=off, 2=longedge, 3=shortedge\n"
+-"-g <xpix>x<ypix>  Set page dimensions in pixels [%dx%d]\n"
+-"-m media          Media code to send to printer [%d]\n"
+-"                    0=auto 1=plain 2=preprinted 3=letterhead 4=transparency\n"
+-"                    5=prepunched 6=labels 7=bond 8=recycled 9=color\n"
+-"                    10=cardstock 11=heavy 12=envelope 13=light 14=tough\n"
+-"                    15=vellum 16=rough 19=thick 20=highqual\n"
+-"-p paper          Paper code to send to printer [%d]\n"
+-"                   1=letter, 3=ledger, 5=legal, 6=statement, 7=executive,\n"
+-"		    8=A3, 9=A4, 11=A5, 12=B4, 13=B5jis, 14=folio, 19=env9,\n"
+-"		    20=env10, 27=envDL, 28=envC5, 30=envC4, 37=envMonarch,\n"
+-"		    257=A6, 258=B6, 259=B5iso, 260=env6\n"
+-"-n copies         Number of copies [%d]\n"
+-"-r <xres>x<yres>  Set device resolution in pixels/inch [%dx%d]\n"
+-"-s source         Source code to send to printer [%d]\n"
+-"                    1=tray1 2=tray2 4=manual 7=auto\n"
+-"                    Code numbers may vary with printer model\n"
+-"-J filename       Filename string to send to printer [%s]\n"
+-"-U username       Username string to send to printer [%s]\n"
++"常规选项:\n"
++"-b bits           自动识别失效时指定单通道位深度（1 或 2）[%d]\n"
++"-c                自动检测失效时强制启用彩色模式\n"
++"-d duplex         下发至打印机的双面打印代码 [%d]\n"
++"                    1=关闭，2=长边翻转，3=短边翻转\n"
++"-g <xpix>x<ypix>  设置页面尺寸，单位像素 [%dx%d]\n"
++"-m media          打印介质代码 [%d]\n"
++"                    0=自动，1=普通纸，2=预印纸，3=信头纸，4=透明胶片\n"
++"                    5=预打孔纸，6=标签纸，7=证券纸，8=再生纸，9=彩色纸\n"
++"                    10=卡纸，11=厚纸，12=信封，13=轻量纸，14=韧性纸\n"
++"                    15=牛皮纸，16=粗糙纸，19=加厚纸，20=高品质纸\n"
++"-p paper          纸张规格代码 [%d]\n"
++"                    1=Letter，3=Ledger，5=Legal，6=Statement，7=Executive，\n"
++"		    8=A3，9=A4，11=A5，12=B4，13=JIS B5，14=Folio，19=9号信封，\n"
++"		    20=10号信封，27=DL信封，28=C5信封，30=C4信封，37=Monarch信封，\n"
++"		    257=A6，258=B6，259=ISO B5，260=6号信封\n"
++"-n copies         打印份数 [%d]\n"
++"-r <xres>x<yres>  设置打印分辨率（像素/英寸）[%dx%d]\n"
++"-s source         进纸来源代码 [%d]\n"
++"                    1=纸盒1，2=纸盒2，4=手动进纸，7=自动选择\n"
++"                    代码编号随打印机型号有所差异\n"
++"-J filename       发送至打印机的文件名 [%s]\n"
++"-U username       发送至打印机的用户名 [%s]\n"
+ "\n"
+-"Printer Tweaking Options:\n"
+-"-u <xoff>x<yoff>  Set offset of upper left printable in pixels [%dx%d]\n"
+-"-l <xoff>x<yoff>  Set offset of lower right printable in pixels [%dx%d]\n"
+-"-L mask           Send logical clipping values from -u/-l in ZjStream [%d]\n"
+-"                  0=no, 1=Y, 2=X, 3=XY\n"
+-"-A                AllIsBlack: convert C=1,M=1,Y=1 to just K=1\n"
+-"-B                BlackClears: K=1 forces C,M,Y to 0\n"
+-"                  -A, -B work with bitcmyk input only\n"
+-"-M mirror         Mirror bytes (0=KM-1635/KM-2035, 1=HP CLJ 1500) [%d]\n"
+-"-z model          Model [%d]\n"
+-"                    0=HP-1500, 1=KM-1635/2035\n"
++"打印机微调选项:\n"
++"-u <xoff>x<yoff>  左上角可打印区域偏移量（像素）[%dx%d]\n"
++"-l <xoff>x<yoff>  右下角可打印区域偏移量（像素）[%dx%d]\n"
++"-L mask           在ZjStream数据流中启用 -u/-l 逻辑裁切参数 [%d]\n"
++"                  0=禁用，1=Y轴裁切，2=X轴裁切，3=XY轴裁切\n"
++"-A                全黑优化：C=1,M=1,Y=1统一转换为K=1\n"
++"-B                黑色清除：K通道为1时强制清空C/M/Y通道\n"
++"                  -A、-B 仅对bitcmyk输入生效\n"
++"-M mirror         字节镜像模式（0=KM-1635/KM-2035，1=HP CLJ 1500）[%d]\n"
++"-z model          指定机型 [%d]\n"
++"                    0=HP-1500，1=KM-1635/2035\n"
+ "\n"
+-"Debugging Options:\n"
+-"-S plane          Output just a single color plane from a color print [all]\n"
+-"                  %d=Cyan, %d=Magenta, %d=Yellow, %d=Black\n"
+-"-D lvl            Set Debug level [%d]\n"
+-"-V                Version %s\n"
++"调试选项:\n"
++"-S plane          仅输出彩色打印单一色版 [默认输出全部色版]\n"
++"                  %d=青色(C)，%d=品红(M)，%d=黄色(Y)，%d=黑色(K)\n"
++"-D lvl            设置调试等级 [%d]\n"
++"-V                版本 %s\n"
+     , Duplex
+     , Bpp
+     , PageWidth , PageHeight
+diff --git a/foo2qpdl-wrapper.in b/foo2qpdl-wrapper.in
+index 2d9993b..3ae8df6 100755
+--- a/foo2qpdl-wrapper.in
++++ b/foo2qpdl-wrapper.in
+@@ -54,69 +54,70 @@ fi
+ 
+ usage() {
+ 	cat <<EOF
+-Usage:
+-	$BASENAME [options] [ps-file]
++用法:
++	$BASENAME [选项] [ps文件]
+ 
+-	Foomatic printer wrapper for the foo2qpdl printer driver.
+-	This script reads a Postscript ps-file or standard input
+-	and converts it to a Samsung QPDL stream (CLP-300, etc.).
++	foo2qpdl 打印机驱动的 Foomatic 包装脚本。
++	此脚本读取 Postscript 文件或标准输入，
++	并将其转换为三星 QPDL 数据流（CLP-300 等）。
+ 
+-Normal Options:
+--c                Print in color (else monochrome)
+--C colormode      Colormode [$COLORMODE]
++普通选项:
++-c                彩色打印（否则为黑白）
++-C colormode      颜色模式 [$COLORMODE]
+                     1=CRD
+-                    10=ICM color profile (using -G *.icm file)
+--d duplex         Duplex code to send to printer [$DUPLEX]
+-                    1=off, 2=longedge, 3=shortedge
+--m media          Media code to send to printer [$MEDIA]
+-                    0=plain, 1=thick, 2=thin. 3=bond, 4=color, 5=card,
+-                    6=labels, 7=envelope, 8=preprinted, 9=cotton,
+-                    10=recycled, 11=transparency, 12=archive
+--p paper          Paper code [$PAPER]
+-                    0=letter, 1=legal, A4=2, 3=executive, 6=env#10,
+-                    7=envMonarch, 8=envC5, 9=envDL, 11=B5jis, 12=B5iso,
+-                    16=A5, 17=A6, 23=envC6, 24=folio, 25=env6.75, 26=env#9,
+-                    28=oficio
+--n copies         Number of copies [$COPIES]
+--r <xres>x<yres>  Set device resolution in pixels/inch [$RES]
+--s source         Source code to send to printer [$SOURCE]
+-                    1=upper, 2=lower, 4=manual, 7=auto
+-		    Code numbers may vary with printer model.
+--t                Draft mode.  Every other pixel is white.
++                    10=ICM 色彩配置文件（使用 -G *.icm 文件）
++-d duplex         向打印机发送的双面打印代码 [$DUPLEX]
++                    1=关闭, 2=长边翻转, 3=短边翻转
++-m media          向打印机发送的介质代码 [$MEDIA]
++                    0=普通纸, 1=厚纸, 2=薄纸, 3=铜版纸, 4=彩色纸,
++                    5=卡纸, 6=标签, 7=信封, 8=预印纸, 9=棉纸,
++                    10=再生纸, 11=透明胶片, 12=档案纸
++-p paper          向打印机发送的纸张代码 [$PAPER]
++                    0=Letter, 1=Legal, A4=2, 3=Executive, 6=信封#10,
++                    7=信封Monarch, 8=信封C5, 9=信封DL, 11=B5(JIS), 12=B5(ISO),
++                    16=A5, 17=A6, 23=信封C6, 24=对开, 25=信封6.75, 26=信封#9,
++                    28=Oficio
++-n copies         打印份数 [$COPIES]
++-r <xres>x<yres>  设置设备分辨率（像素/英寸）[$RES]
++-s source         向打印机发送的纸盒来源代码 [$SOURCE]
++                    1=上纸盒, 2=下纸盒, 4=手动, 7=自动
++		    代码可能因打印机型号而异
++-t                草稿模式（每隔一个像素变白）
+ -2/-3/-4/-6/-8/-10/-12/-14/-15/-16/-18
+-                  Print with N-up (requires psutils)
+--o orient         For N-up: -op is portrait, -ol is landscape, -os is seascape.
+-
+-Printer Tweaking Options:
+--u <xoff>x<yoff>  Set offset of upper left printable in pixels [varies]
+--l <xoff>x<yoff>  Set offset of lower right printable in pixels [varies]
+--L mask           Send logical clipping values from -u/-l in ZjStream [3]
+-                  0=no, 1=Y, 2=X, 3=XY
+--P                Do not output START_PLANE codes.  May be needed by some
+-                  monochrome-only printers.
+--X padlen         Add extra zero padding to the end of BID segments [16]
+--z model          Printer Model [$MODEL]
++                  多页打印（需要 psutils）
++-o orient         多页打印方向：-op 纵向, -ol 横向, -os 倒置横向
++
++打印机调整选项:
++-u <xoff>x<yoff>  设置左上角可打印区域偏移量（像素）[可变]
++-l <xoff>x<yoff>  设置右下角可打印区域偏移量（像素）[可变]
++-L mask           在 ZjStream 中发送来自 -u/-l 的逻辑裁剪值 [3]
++                  0=禁用, 1=Y轴, 2=X轴, 3=XY轴
++-P                不输出 START_PLANE 代码。部分单色打印机可能需要此选项
++-X padlen         在 BID 段末尾添加额外的零填充 [16]
++-z model          打印机型号 [$MODEL]
+                          0=CLP-300, CLX-2160, CLX-3160
+                          1=CLP-600
+                          2=CLP-310, CLP-315, CLP-610, CLX-3175
+                          3=CLP-620, CLP-360, CLP-365
+ 
+-Color Tweaking Options:
+--a parm=val       Color Adjust. "parm" is b,c,s,cr,mg,yb. "val" is 0-100
+--g gsopts         Additional options to pass to Ghostscript, such as
+-                  -dDITHERPPI=nnn, etc.  May appear more than once. []
+--G profile.icm    Convert profile.icm to a Postscript CRD using icc2ps and
+-                  adjust colors using the setcolorrendering PS operator.
+-                  $SHARE/icm/ will be searched for profile.icm.
+--I intent         Select profile intent from ICM file [$INTENT]
+-                  0=Perceptual, 1=Colorimetric, 2=Saturation, 3=Absolute
+--G gamma-file.ps  Prepend gamma-file to the Postscript input to perform
+-                  color correction using the setcolortransfer PS operator.
+-
+-Debugging Options:
+--S plane          Output just a single color plane from a color print [all]
+-                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black
+--D lvl            Set Debug level [$DEBUG]
++色彩调整选项:
++-a parm=val       色彩调整。"parm" 为 b（亮度）、c（对比度）、s（饱和度）、
++                  cr（青色-红色）、mg（品红-绿色）、yb（黄色-蓝色），
++                  "val" 为 0-100
++-g gsopts         传递给 Ghostscript 的额外选项，例如
++                  -dDITHERPPI=nnn 等，可多次出现 []
++-G profile.icm    使用 icc2ps 将 profile.icm 转换为 Postscript CRD，
++                  并使用 setcolorrendering PS 操作符调整颜色。
++                  会搜索 $SHARE/icm/ 目录中的 profile.icm。
++-I intent         从 ICM 文件中选择配置意图 [$INTENT]
++                  0=感知, 1=色度, 2=饱和度, 3=绝对
++-G gamma-file.ps  将 gamma 文件前置到 Postscript 输入中，
++                  使用 setcolortransfer PS 操作符进行颜色校正。
++
++调试选项:
++-S plane          仅输出彩色打印中的单个颜色平面 [全部]
++                  1=青色, 2=品红, 3=黄色, 4=黑色
++-D lvl            设置调试级别 [$DEBUG]
+ -V                $VERSION
+ EOF
+ 
+diff --git a/foo2qpdl.c b/foo2qpdl.c
+index cade6ed..6f829e9 100644
+--- a/foo2qpdl.c
++++ b/foo2qpdl.c
+@@ -156,75 +156,74 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"   foo2qpdl [options] <pbmraw-file >qpdl-file\n"
++"使用方式:\n"
++"   foo2qpdl [选项] <pbmraw文件 >qpdl文件\n"
+ "\n"
+-"	Convert Ghostscript pbmraw format to a monochrome ZJS stream,\n"
+-"	for driving the HP LaserJet M1005 MFP laser printer.\n"
++"	将Ghostscript pbmraw格式转换为单色ZJS打印数据流，\n"
++"	适用于惠普 LaserJet M1005 MFP 激光打印机。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"		-sPAPERSIZE=letter -r1200x600 -sDEVICE=pbmraw \\ \n"
+-"		-sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"		-sPAPERSIZE=letter -r1200x600 -sDEVICE=pbmraw \\\n"
++"		-sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2qpdl -r1200x600 -g10200x6600 -p1 >testpage.zm\n"
+ "\n"
+-"   foo2qpdl [options] <bitcmyk-file >qpdl-file\n"
+-"   foo2qpdl [options] <pksmraw-file >qpdl-file\n"
++"   foo2qpdl [选项] <bitcmyk文件 >qpdl文件\n"
++"   foo2qpdl [选项] <pksmraw文件 >qpdl文件\n"
+ "\n"
+-"	Convert Ghostscript bitcmyk or pksmraw format to a color ZJS stream,\n"
+-"	for driving the HP LaserJet M1005 MFP color laser printer\n"
+-"	N.B. Color correction is expected to be performed by ghostscript.\n"
++"	将Ghostscript bitcmyk 或 pksmraw格式转换为彩色ZJS打印数据流，\n"
++"	适用于惠普 LaserJet M1005 MFP 彩色激光打印机。\n"
++"	注意：色彩校正工作由Ghostscript完成。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"	    -sPAPERSIZE=letter -g10200x6600 -r1200x600 -sDEVICE=bitcmyk \\ \n"
+-"	    -sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"	    -sPAPERSIZE=letter -g10200x6600 -r1200x600 -sDEVICE=bitcmyk \\\n"
++"	    -sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2qpdl -r1200x600 -g10200x6600 -p1 >testpage.zc\n"
+ "\n"
+-"Normal Options:\n"
+-"-c                Force color mode if autodetect doesn't work\n"
+-"-d duplex         Duplex code to send to printer [%d]\n"
+-"                    1=off, 2=longedge, 3=shortedge\n"
+-"-g <xpix>x<ypix>  Set page dimensions in pixels [%dx%d]\n"
+-"-m media          Media code to send to printer [%d]\n"
+-"                    0=plain, 1=thick, 2=thin. 3=bond, 4=color, 5=card,\n"
+-"                    6=labels, 7=envelope, 8=preprinted, 9=cotton,\n"
+-"                   10=recycled, 11=transparency, 12=archive\n"
+-"-p paper          Paper code [%d]\n"
+-"                    0=letter, 1=legal, A4=2, 3=executive, 6=env#10,\n"
+-"                    7=envMonarch, 8=envC5, 9=envDL, 11=B5jis, 12=B5iso,\n"
+-"                    16=A5, 17=A6, 21=custom, 23=envC6, 24=folio, 25=env6.75,\n"
+-"                    26=env#9, 28=oficio\n"
+-"-n copies         Number of copies [%d]\n"
+-"-r <xres>x<yres>  Set device resolution in pixels/inch [%dx%d]\n"
+-"-s source         Source code to send to printer [%d]\n"
+-"                    1=upper 2=lower 4=manual 7=auto\n"
+-"                    Code numbers may vary with printer model\n"
+-"-t                Draft mode.  Every other pixel is white.\n"
+-"-J filename       Filename string to send to printer [%s]\n"
+-"-U username       Username string to send to printer [%s]\n"
++"常规选项:\n"
++"-c                自动检测失效时强制启用彩色模式\n"
++"-d duplex         下发至打印机的双面打印代码 [%d]\n"
++"                    1=关闭，2=长边翻转，3=短边翻转\n"
++"-g <xpix>x<ypix>  设置页面尺寸，单位像素 [%dx%d]\n"
++"-m media          打印介质代码 [%d]\n"
++"                    0=普通纸，1=厚纸，2=薄纸，3=证券纸，4=彩色纸，5=卡纸，\n"
++"                    6=标签纸，7=信封，8=预印纸，9=棉纸，\n"
++"                   10=再生纸，11=透明胶片，12=档案用纸\n"
++"-p paper          纸张规格代码 [%d]\n"
++"                    0=Letter，1=Legal，2=A4，3=Executive，6=10号信封，\n"
++"                    7=Monarch信封，8=C5信封，9=DL信封，11=JIS B5，12=ISO B5，\n"
++"                    16=A5，17=A6，21=自定义尺寸，23=C6信封，24=Folio，25=6.75号信封，\n"
++"                    26=9号信封，28=Oficio\n"
++"-n copies         打印份数 [%d]\n"
++"-r <xres>x<yres>  设置打印分辨率（像素/英寸）[%dx%d]\n"
++"-s source         进纸来源代码 [%d]\n"
++"                    1=上层纸盒，2=下层纸盒，4=手动进纸，7=自动选择\n"
++"                    代码编号随打印机型号有所差异\n"
++"-t                草稿模式，隔像素留白\n"
++"-J filename       发送至打印机的文件名 [%s]\n"
++"-U username       发送至打印机的用户名 [%s]\n"
+ "\n"
+-"Printer Tweaking Options:\n"
+-"-a b,c,s,cr,mg,yb Color Adjust from 0 to 100 [50,50,50,50,50,50]\n"
+-"-u <xoff>x<yoff>  Set offset of upper left printable in pixels [%dx%d]\n"
+-"-l <xoff>x<yoff>  Set offset of lower right printable in pixels [%dx%d]\n"
+-"-L mask           Send logical clipping values from -u/-l in ZjStream [%d]\n"
+-"                  0=no, 1=Y, 2=X, 3=XY\n"
+-"-A                AllIsBlack: convert C=1,M=1,Y=1 to just K=1\n"
+-"-B                BlackClears: K=1 forces C,M,Y to 0\n"
+-"                  -A, -B work with bitcmyk input only\n"
+-"-P                Do not output START_PLANE codes.  May be needed by some\n"
+-"                  some black and white only printers.\n"
+-"-X padlen         Add extra zero padding to the end of BID segments [%d]\n"
+-"-z model          Model [%d]\n"
+-"                    0=CLP-300, CLX-2160, CLX-3160\n"
++"打印机微调选项:\n"
++"-a b,c,s,cr,mg,yb 色彩调整，取值范围0~100 [50,50,50,50,50,50]\n"
++"-u <xoff>x<yoff>  左上角可打印区域偏移量（像素）[%dx%d]\n"
++"-l <xoff>x<yoff>  右下角可打印区域偏移量（像素）[%dx%d]\n"
++"-L mask           在ZjStream数据流中启用 -u/-l 逻辑裁切参数 [%d]\n"
++"                  0=禁用，1=Y轴裁切，2=X轴裁切，3=XY轴裁切\n"
++"-A                全黑优化：C=1,M=1,Y=1统一转换为K=1\n"
++"-B                黑色清除：K通道为1时强制清空C/M/Y通道\n"
++"                  -A、-B 仅对bitcmyk输入生效\n"
++"-P                不输出START_PLANE指令，部分单色打印机需要此参数\n"
++"-X padlen         在BID数据段末尾追加零填充字节 [%d]\n"
++"-z model          指定机型 [%d]\n"
++"                    0=CLP-300、CLX-2160、CLX-3160\n"
+ "                    1=CLP-600\n"
+-"                    2=CLP-310/315, CLP-320/325, CLP-610, CLX-3175\n"
+-"                    3=CLP-360/365, CLP-620\n"
++"                    2=CLP-310/315、CLP-320/325、CLP-610、CLX-3175\n"
++"                    3=CLP-360/365、CLP-620\n"
+ "\n"
+-"Debugging Options:\n"
+-"-S plane          Output just a single color plane from a color print [all]\n"
+-"                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black\n"
+-"-D lvl            Set Debug level [%d]\n"
+-"-V                Version %s\n"
++"调试选项:\n"
++"-S plane          仅输出彩色打印单一色版 [默认输出全部色版]\n"
++"                  1=青色(C)，2=品红(M)，3=黄色(Y)，4=黑色(K)\n"
++"-D lvl            设置调试等级 [%d]\n"
++"-V                版本 %s\n"
+     , Duplex
+     , PageWidth , PageHeight
+     , MediaCode
+diff --git a/foo2slx-wrapper.in b/foo2slx-wrapper.in
+index 0a3f143..e31184c 100755
+--- a/foo2slx-wrapper.in
++++ b/foo2slx-wrapper.in
+@@ -41,51 +41,51 @@ fi
+ 
+ usage() {
+ 	cat <<EOF
+-Usage:
+-	$BASENAME [options] [ps-file]
+-
+-	Foomatic printer wrapper for the foo2slx printer driver.
+-	This script reads a Postscript ps-file or standard input
+-	and converts it to Software Imaging K.K. SLX printer format.
+-
+-Normal Options:
+--c                Print in color (else monochrome)
+--m media          Media code to send to printer [$MEDIA]
+-                    0=plain, 1=transparency, 2=labels, 3=thick1, 4=envelope1,
+-		    5=thin, 6=thick2, 7=envelope2, 8=middle, 9=special
+--p paper          Paper code [$PAPER]
+-                    2=a4, 4=b5, 5=b5iso, 6=letter, 8=executive, 9=legal,
+-                    10=env#10, 11=envDL
+--n copies         Number of copies [$COPIES]
+--r <xres>x<yres>  Set device resolution in pixels/inch [$RES]
+--s source         Source code to send to printer [$SOURCE]
+-                    0=auto, 1=cassette1
+-		    Code numbers may vary with printer model.
++用法:
++	$BASENAME [选项] [ps文件]
++
++	foo2slx 打印机驱动的 Foomatic 包装脚本。
++	此脚本读取 Postscript 文件或标准输入，
++	并将其转换为 Software Imaging K.K. SLX 打印机格式。
++
++普通选项:
++-c                彩色打印（否则为黑白）
++-m media          向打印机发送的介质代码 [$MEDIA]
++                    0=普通纸, 1=透明胶片, 2=标签, 3=厚纸1, 4=信封1,
++		    5=薄纸, 6=厚纸2, 7=信封2, 8=中厚纸, 9=特殊纸
++-p paper          向打印机发送的纸张代码 [$PAPER]
++                    2=A4, 4=B5, 5=B5(ISO), 6=Letter, 8=Executive, 9=Legal,
++                    10=信封#10, 11=信封DL
++-n copies         打印份数 [$COPIES]
++-r <xres>x<yres>  设置设备分辨率（像素/英寸）[$RES]
++-s source         向打印机发送的纸盒来源代码 [$SOURCE]
++                    0=自动, 1=纸盒1
++		    代码可能因打印机型号而异
+ -2/-3/-4/-6/-8/-10/-12/-14/-15/-16/-18
+-                  Print with N-up (requires psutils)
+--o orient         For N-up: -op is portrait, -ol is landscape, -os is seascape.
+-
+-Printer Tweaking Options:
+--u <xoff>x<yoff>  Set offset of upper left printable in pixels [varies]
+--l <xoff>x<yoff>  Set offset of lower right printable in pixels [varies]
+--L mask           Send logical clipping values from -u/-l in ZjStream [3]
+-                  0=no, 1=Y, 2=X, 3=XY
+-
+-Color Tweaking Options:
+--g gsopts         Additional options to pass to Ghostscript, such as
+-                  -dDITHERPPI=nnn, etc.  May appear more than once. []
+--G profile.icm    Convert profile.icm to a Postscript CRD using icc2ps and
+-                  adjust colors using the setcolorrendering PS operator.
+-                  $SHARE/icm/ will be searched for profile.icm.
+--I intent         Select profile intent from ICM file [$INTENT]
+-                  0=Perceptual, 1=Colorimetric, 2=Saturation, 3=Absolute
+--G gamma-file.ps  Prepend gamma-file to the Postscript input to perform
+-                  color correction using the setcolortransfer PS operator.
+-
+-Debugging Options:
+--S plane          Output just a single color plane from a color print [all]
+-                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black
+--D lvl            Set Debug level [$DEBUG]
++                  多页打印（需要 psutils）
++-o orient         多页打印方向：-op 纵向, -ol 横向, -os 倒置横向
++
++打印机调整选项:
++-u <xoff>x<yoff>  设置左上角可打印区域偏移量（像素）[可变]
++-l <xoff>x<yoff>  设置右下角可打印区域偏移量（像素）[可变]
++-L mask           在 ZjStream 中发送来自 -u/-l 的逻辑裁剪值 [3]
++                  0=禁用, 1=Y轴, 2=X轴, 3=XY轴
++
++色彩调整选项:
++-g gsopts         传递给 Ghostscript 的额外选项，例如
++                  -dDITHERPPI=nnn 等，可多次出现 []
++-G profile.icm    使用 icc2ps 将 profile.icm 转换为 Postscript CRD，
++                  并使用 setcolorrendering PS 操作符调整颜色。
++                  会搜索 $SHARE/icm/ 目录中的 profile.icm。
++-I intent         从 ICM 文件中选择配置意图 [$INTENT]
++                  0=感知, 1=色度, 2=饱和度, 3=绝对
++-G gamma-file.ps  将 gamma 文件前置到 Postscript 输入中，
++                  使用 setcolortransfer PS 操作符进行颜色校正。
++
++调试选项:
++-S plane          仅输出彩色打印中的单个颜色平面 [全部]
++                  1=青色, 2=品红, 3=黄色, 4=黑色
++-D lvl            设置调试级别 [$DEBUG]
+ -V                $VERSION
+ EOF
+ 
+diff --git a/foo2slx.c b/foo2slx.c
+index 60952b1..b66efdb 100644
+--- a/foo2slx.c
++++ b/foo2slx.c
+@@ -129,69 +129,69 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"   foo2slx [options] <pbmraw-file >slx-file\n"
++"使用方式:\n"
++"   foo2slx [选项] <pbmraw文件 >slx文件\n"
+ "\n"
+-"	Convert Ghostscript pbmraw format to a monochrome SLX stream,\n"
+-"	for driving the Lexmark C500 network color laser printer\n"
+-"	and other SLX-based and Lexmark black and white printers.\n"
++"	将Ghostscript pbmraw格式转换为单色SLX打印数据流，\n"
++"	适用于利盟 C500 网络彩色激光打印机\n"
++"	以及其他基于SLX协议的利盟黑白打印机。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"		-sPAPERSIZE=letter -r1200x600 -sDEVICE=pbmraw \\ \n"
+-"		-sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"		-sPAPERSIZE=letter -r1200x600 -sDEVICE=pbmraw \\\n"
++"		-sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2slx -r1200x600 -g10200x6600 -p1 >testpage.zm\n"
+ "\n"
+-"   foo2slx [options] <bitcmyk-file >slx-file\n"
+-"   foo2slx [options] <pksmraw-file >slx-file\n"
++"   foo2slx [选项] <bitcmyk文件 >slx文件\n"
++"   foo2slx [选项] <pksmraw文件 >slx文件\n"
+ "\n"
+-"	Convert Ghostscript bitcmyk or pksmraw format to a color SLX stream,\n"
+-"	for driving the Lexmark C500 network color laser printer.\n"
+-"	N.B. Color correction is expected to be performed by ghostscript.\n"
++"	将Ghostscript bitcmyk 或 pksmraw格式转换为彩色SLX打印数据流，\n"
++"	适用于利盟 C500 网络彩色激光打印机。\n"
++"	注意：色彩校正工作由Ghostscript完成。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"	    -sPAPERSIZE=letter -g10200x6600 -r1200x600 -sDEVICE=bitcmyk \\ \n"
+-"	    -sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"	    -sPAPERSIZE=letter -g10200x6600 -r1200x600 -sDEVICE=bitcmyk \\\n"
++"	    -sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2slx -r1200x600 -g10200x6600 -p1 >testpage.zc\n"
+ "\n"
+-"Normal Options:\n"
+-"-c                Force color mode if autodetect doesn't work\n"
+-// "-d duplex         Duplex code to send to printer [%d]\n"
+-// "                    1=off, 2=longedge, 3=shortedge\n"
+-// "                    4=manual longedge, 5=manual shortedge\n"
+-"-g <xpix>x<ypix>  Set page dimensions in pixels [%dx%d]\n"
+-"-m media          Media code to send to printer [%d]\n"
+-"                    0=plain, 1=transparency, 2=labels, 3=thick1, 4=envelope1\n"
+-"                    5=thin, 6=thick2, 7=envelope2, 8=middle, 9=special\n"
+-"-p paper          Paper code to send to printer [%d]\n"
+-"                    2=a4, 4=b5, 5=b5iso, 6=letter, 8=executive, 9=legal,\n"
+-"                    10=env#10, 11=envDL\n"
+-"-n copies         Number of copies [%d]\n"
+-"-r <xres>x<yres>  Set device resolution in pixels/inch [%dx%d]\n"
+-"-s source         Source code to send to printer [%d]\n"
+-"                    1=upper 2=lower 4=manual 7=auto\n"
+-"                    Code numbers may vary with printer model\n"
+-// "-t                Draft mode.  Every other pixel is white.\n"
+-// "-J filename       Filename string to send to printer [%s]\n"
+-// "-U username       Username string to send to printer [%s]\n"
++"常规选项:\n"
++"-c                自动检测失效时强制启用彩色模式\n"
++// "-d duplex         下发至打印机的双面打印代码 [%d]\n"
++// "                    1=关闭，2=长边翻转，3=短边翻转\n"
++// "                    4=手动长边翻转，5=手动短边翻转\n"
++"-g <xpix>x<ypix>  设置页面尺寸，单位像素 [%dx%d]\n"
++"-m media          打印介质代码 [%d]\n"
++"                    0=普通纸，1=透明胶片，2=标签纸，3=厚纸1，4=信封1\n"
++"                    5=薄纸，6=厚纸2，7=信封2，8=中等厚度纸，9=特殊介质\n"
++"-p paper          纸张规格代码 [%d]\n"
++"                    2=A4，4=JIS B5，5=ISO B5，6=Letter，8=Executive，9=Legal，\n"
++"                    10=10号信封，11=DL信封\n"
++"-n copies         打印份数 [%d]\n"
++"-r <xres>x<yres>  设置打印分辨率（像素/英寸）[%dx%d]\n"
++"-s source         进纸来源代码 [%d]\n"
++"                    1=上层纸盒，2=下层纸盒，4=手动进纸，7=自动选择\n"
++"                    代码编号随打印机型号有所差异\n"
++// "-t                草稿模式，隔像素留白\n"
++// "-J filename       发送至打印机的文件名 [%s]\n"
++// "-U username       发送至打印机的用户名 [%s]\n"
+ "\n"
+-"Printer Tweaking Options:\n"
+-"-u <xoff>x<yoff>  Set offset of upper left printable in pixels [%dx%d]\n"
+-"-l <xoff>x<yoff>  Set offset of lower right printable in pixels [%dx%d]\n"
+-"-L mask           Send logical clipping values from -u/-l in ZjStream [%d]\n"
+-"                  0=no, 1=Y, 2=X, 3=XY\n"
+-"-A                AllIsBlack: convert C=1,M=1,Y=1 to just K=1\n"
+-"-B                BlackClears: K=1 forces C,M,Y to 0\n"
+-"                  -A, -B work with bitcmyk input only\n"
+-// "-P                Do not output START_PLANE codes.  May be needed by some\n"
+-// "                  some black and white only printers.\n"
+-// "-X padlen         Add extra zero padding to the end of BID segments [%d]\n"
+-// "-z model          Model: 0=2300DL 1=hp1020 [%d]\n"
++"打印机微调选项:\n"
++"-u <xoff>x<yoff>  左上角可打印区域偏移量（像素）[%dx%d]\n"
++"-l <xoff>x<yoff>  右下角可打印区域偏移量（像素）[%dx%d]\n"
++"-L mask           在ZjStream数据流中启用 -u/-l 逻辑裁切参数 [%d]\n"
++"                  0=禁用，1=Y轴裁切，2=X轴裁切，3=XY轴裁切\n"
++"-A                全黑优化：C=1,M=1,Y=1统一转换为K=1\n"
++"-B                黑色清除：K通道为1时强制清空C/M/Y通道\n"
++"                  -A、-B 仅对bitcmyk输入生效\n"
++// "-P                不输出START_PLANE指令，部分单色打印机需要此参数\n"
++// "                  部分黑白打印机需要该选项\n"
++// "-X padlen         在BID数据段末尾追加零填充字节 [%d]\n"
++// "-z model          指定机型：0=2300DL 1=hp1020 [%d]\n"
+ "\n"
+-"Debugging Options:\n"
+-"-S plane          Output just a single color plane from a color print [all]\n"
+-"                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black\n"
+-"-D lvl            Set Debug level [%d]\n"
+-"-V                Version %s\n"
++"调试选项:\n"
++"-S plane          仅输出彩色打印单一色版 [默认输出全部色版]\n"
++"                  1=青色(C)，2=品红(M)，3=黄色(Y)，4=黑色(K)\n"
++"-D lvl            设置调试等级 [%d]\n"
++"-V                版本 %s\n"
+     // , Duplex
+     , PageWidth , PageHeight
+     , MediaCode
+diff --git a/foo2xqx-wrapper.in b/foo2xqx-wrapper.in
+index d79471d..78b8291 100755
+--- a/foo2xqx-wrapper.in
++++ b/foo2xqx-wrapper.in
+@@ -51,59 +51,58 @@ fi
+ 
+ usage() {
+ 	cat <<EOF
+-Usage:
+-	$BASENAME [options] [ps-file]
+-
+-	Foomatic printer wrapper for the foo2xqx printer driver.
+-	This script reads a Postscript ps-file or standard input
+-	and converts it to Zenographics ZjStream printer format.
+-
+-Normal Options:
+--c                Print in color (else monochrome)
+--d duplex         Duplex code to send to printer [$DUPLEX]
+-                    1=off, 2=longedge, 3=shortedge
+--m media          Media code to send to printer [$MEDIA]
+-                    1=standard, 2=transparency, 3=glossy, 257=envelope,
+-                    259=letterhead, 261=thickstock, 262=postcard, 263=labels
+--p paper          Paper code [$PAPER]
+-                    1=letter, 5=legal, 7=executive, 9=A4, 11=A5, 13=B5
+-                    20=env#10, 27=envDL 28=envC5 34=envB5 37=envMonarch
+-		    257=16k197x273, 263=16k184x260, 264=16k195x270
+--n copies         Number of copies [$COPIES]
+--r <xres>x<yres>  Set device resolution in pixels/inch [$RES]
+--s source         Source code to send to printer [$SOURCE]
+-                    1=upper, 2=lower, 4=manual, 7=auto
+-		    Code numbers may vary with printer model.
+--t                Draft mode.  Every other pixel is white.
+--T density        Print density (1-5) [$DENSITY]
++用法:
++	$BASENAME [选项] [ps文件]
++
++	foo2xqx 打印机驱动的 Foomatic 包装脚本。
++	此脚本读取 Postscript 文件或标准输入，
++	并将其转换为 Zenographics ZjStream 打印机格式。
++
++普通选项:
++-c                彩色打印（否则为黑白）
++-d duplex         向打印机发送的双面打印代码 [$DUPLEX]
++                    1=关闭, 2=长边翻转, 3=短边翻转
++-m media          向打印机发送的介质代码 [$MEDIA]
++                    1=普通纸, 2=透明胶片, 3=铜版纸, 257=信封,
++                    259=信纸, 261=厚纸, 262=明信片, 263=标签
++-p paper          向打印机发送的纸张代码 [$PAPER]
++                    1=Letter, 5=Legal, 7=Executive, 9=A4, 11=A5, 13=B5
++                    20=信封#10, 27=信封DL, 28=信封C5, 34=信封B5, 37=信封Monarch
++		    257=16K 197x273, 263=16K 184x260, 264=16K 195x270
++-n copies         打印份数 [$COPIES]
++-r <xres>x<yres>  设置设备分辨率（像素/英寸）[$RES]
++-s source         向打印机发送的纸盒来源代码 [$SOURCE]
++                    1=上纸盒, 2=下纸盒, 4=手动, 7=自动
++		    代码可能因打印机型号而异
++-t                草稿模式（每隔一个像素变白）
++-T density        打印浓度（1-5）[$DENSITY]
+ -2/-3/-4/-6/-8/-10/-12/-14/-15/-16/-18
+-                  Print with N-up (requires psutils)
+--o orient         For N-up: -op is portrait, -ol is landscape, -os is seascape.
+-
+-Printer Tweaking Options:
+--u <xoff>x<yoff>  Set offset of upper left printable in pixels [varies]
+--l <xoff>x<yoff>  Set offset of lower right printable in pixels [varies]
+--L mask           Send logical clipping values from -u/-l in ZjStream [3]
+-                  0=no, 1=Y, 2=X, 3=XY
+--P                Do not output START_PLANE codes.  May be needed by some
+-                  monochrome-only printers.
+--X padlen         Add extra zero padding to the end of BID segments [16]
+-
+-Color Tweaking Options:
+--g gsopts         Additional options to pass to Ghostscript, such as
+-                  -dDITHERPPI=nnn, etc.  May appear more than once. []
+--G profile.icm    Convert profile.icm to a Postscript CRD using icc2ps and
+-                  adjust colors using the setcolorrendering PS operator.
+-                  $SHARE/icm/ will be searched for profile.icm.
+--I intent         Select profile intent from ICM file [$INTENT]
+-                  0=Perceptual, 1=Colorimetric, 2=Saturation, 3=Absolute
+--G gamma-file.ps  Prepend gamma-file to the Postscript input to perform
+-                  color correction using the setcolortransfer PS operator.
+-
+-Debugging Options:
+--S plane          Output just a single color plane from a color print [all]
+-                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black
+--D lvl            Set Debug level [$DEBUG]
++                  多页打印（需要 psutils）
++-o orient         多页打印方向：-op 纵向, -ol 横向, -os 倒置横向
++
++打印机调整选项:
++-u <xoff>x<yoff>  设置左上角可打印区域偏移量（像素）[可变]
++-l <xoff>x<yoff>  设置右下角可打印区域偏移量（像素）[可变]
++-L mask           在 ZjStream 中发送来自 -u/-l 的逻辑裁剪值 [3]
++                  0=禁用, 1=Y轴, 2=X轴, 3=XY轴
++-P                不输出 START_PLANE 代码。部分单色打印机可能需要此选项
++-X padlen         在 BID 段末尾添加额外的零填充 [16]
++
++色彩调整选项:
++-g gsopts         传递给 Ghostscript 的额外选项，例如
++                  -dDITHERPPI=nnn 等，可多次出现 []
++-G profile.icm    使用 icc2ps 将 profile.icm 转换为 Postscript CRD，
++                  并使用 setcolorrendering PS 操作符调整颜色。
++                  会搜索 $SHARE/icm/ 目录中的 profile.icm。
++-I intent         从 ICM 文件中选择配置意图 [$INTENT]
++                  0=感知, 1=色度, 2=饱和度, 3=绝对
++-G gamma-file.ps  将 gamma 文件前置到 Postscript 输入中，
++                  使用 setcolortransfer PS 操作符进行颜色校正。
++
++调试选项:
++-S plane          仅输出彩色打印中的单个颜色平面 [全部]
++                  1=青色, 2=品红, 3=黄色, 4=黑色
++-D lvl            设置调试级别 [$DEBUG]
+ -V                $VERSION
+ EOF
+ 
+diff --git a/foo2xqx.c b/foo2xqx.c
+index e9f8239..e973e84 100644
+--- a/foo2xqx.c
++++ b/foo2xqx.c
+@@ -131,68 +131,67 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"   foo2xqx [options] <pbmraw-file >xqx-file\n"
++"使用方式:\n"
++"   foo2xqx [选项] <pbmraw文件 >xqx文件\n"
+ "\n"
+-"	Convert Ghostscript pbmraw format to a monochrome ZJS stream,\n"
+-"	for driving the HP LaserJet M1005 MFP laser printer.\n"
++"	将Ghostscript pbmraw格式转换为单色ZJS打印数据流，\n"
++"	适用于惠普 LaserJet M1005 MFP 激光打印机。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"		-sPAPERSIZE=letter -r1200x600 -sDEVICE=pbmraw \\ \n"
+-"		-sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"		-sPAPERSIZE=letter -r1200x600 -sDEVICE=pbmraw \\\n"
++"		-sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2xqx -r1200x600 -g10200x6600 -p1 >testpage.zm\n"
+ "\n"
+-"   foo2xqx [options] <bitcmyk-file >xqx-file\n"
+-"   foo2xqx [options] <pksmraw-file >xqx-file\n"
++"   foo2xqx [选项] <bitcmyk文件 >xqx文件\n"
++"   foo2xqx [选项] <pksmraw文件 >xqx文件\n"
+ "\n"
+-"	Convert Ghostscript bitcmyk or pksmraw format to a color ZJS stream,\n"
+-"	for driving the HP LaserJet M1005 MFP color laser printer\n"
+-"	N.B. Color correction is expected to be performed by ghostscript.\n"
++"	将Ghostscript bitcmyk 或 pksmraw格式转换为彩色ZJS打印数据流，\n"
++"	适用于惠普 LaserJet M1005 MFP 彩色激光打印机\n"
++"	注意：色彩校正工作由Ghostscript完成。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"	    -sPAPERSIZE=letter -g10200x6600 -r1200x600 -sDEVICE=bitcmyk \\ \n"
+-"	    -sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"	    -sPAPERSIZE=letter -g10200x6600 -r1200x600 -sDEVICE=bitcmyk \\\n"
++"	    -sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2xqx -r1200x600 -g10200x6600 -p1 >testpage.zc\n"
+ "\n"
+-"Normal Options:\n"
+-"-c                Force color mode if autodetect doesn't work\n"
+-"-d duplex         Duplex code to send to printer [%d]\n"
+-"                    1=off, 2=longedge, 3=shortedge\n"
+-"-g <xpix>x<ypix>  Set page dimensions in pixels [%dx%d]\n"
+-"-m media          Media code to send to printer [%d]\n"
+-"                    1=standard 2=transparency 3=glossy 257=envelope\n"
+-"                    259=letterhead 261=thickstock 262=postcard 263=labels\n"
+-"-p paper          Paper code to send to printer [%d]\n"
+-"                    1=letter, 5=legal 7=executive 9=A4 11=A5 13=B5\n"
+-"                    20=env#10, 27=envDL 28=envC5 34=envB5 37=envMonarch\n"
+-"                    257=16k197x273, 263=16k184x260, 264=16k195x270\n"
+-"-n copies         Number of copies [%d]\n"
+-"-r <xres>x<yres>  Set device resolution in pixels/inch [%dx%d]\n"
+-"-s source         Source code to send to printer [%d]\n"
+-"                    1=upper 2=lower 4=manual 7=auto\n"
+-"                    Code numbers may vary with printer model\n"
+-"-t                Draft mode.  Every other pixel is white.\n"
+-"-T density        Print density (1-5) [%d].\n"
+-"-J filename       Filename string to send to printer [%s]\n"
+-"-U username       Username string to send to printer [%s]\n"
++"常规选项:\n"
++"-c                自动检测失效时强制启用彩色模式\n"
++"-d duplex         下发至打印机的双面打印代码 [%d]\n"
++"                    1=关闭，2=长边翻转，3=短边翻转\n"
++"-g <xpix>x<ypix>  设置页面尺寸，单位像素 [%dx%d]\n"
++"-m media          打印介质代码 [%d]\n"
++"                    1=普通纸，2=透明胶片，3=高光纸，257=信封\n"
++"                    259=信头纸，261=厚纸，262=明信片，263=标签纸\n"
++"-p paper          纸张规格代码 [%d]\n"
++"                    1=Letter，5=Legal，7=Executive，9=A4，11=A5，13=B5\n"
++"                    20=10号信封，27=DL信封，28=C5信封，34=B5信封，37=Monarch信封\n"
++"                    257=16K(197×273)，263=16K(184×260)，264=16K(195×270)\n"
++"-n copies         打印份数 [%d]\n"
++"-r <xres>x<yres>  设置打印分辨率（像素/英寸）[%dx%d]\n"
++"-s source         进纸来源代码 [%d]\n"
++"                    1=上层纸盒，2=下层纸盒，4=手动进纸，7=自动选择\n"
++"                    代码编号随打印机型号有所差异\n"
++"-t                草稿模式，隔像素留白\n"
++"-T density        打印浓度（取值1-5）[%d]\n"
++"-J filename       发送至打印机的文件名 [%s]\n"
++"-U username       发送至打印机的用户名 [%s]\n"
+ "\n"
+-"Printer Tweaking Options:\n"
+-"-u <xoff>x<yoff>  Set offset of upper left printable in pixels [%dx%d]\n"
+-"-l <xoff>x<yoff>  Set offset of lower right printable in pixels [%dx%d]\n"
+-"-L mask           Send logical clipping values from -u/-l in ZjStream [%d]\n"
+-"                  0=no, 1=Y, 2=X, 3=XY\n"
+-"-A                AllIsBlack: convert C=1,M=1,Y=1 to just K=1\n"
+-"-B                BlackClears: K=1 forces C,M,Y to 0\n"
+-"                  -A, -B work with bitcmyk input only\n"
+-"-P                Do not output START_PLANE codes.  May be needed by some\n"
+-"                  some black and white only printers.\n"
+-"-X padlen         Add extra zero padding to the end of BID segments [%d]\n"
++"打印机微调选项:\n"
++"-u <xoff>x<yoff>  左上角可打印区域偏移量（像素）[%dx%d]\n"
++"-l <xoff>x<yoff>  右下角可打印区域偏移量（像素）[%dx%d]\n"
++"-L mask           在ZjStream数据流中启用 -u/-l 逻辑裁切参数 [%d]\n"
++"                  0=禁用，1=Y轴裁切，2=X轴裁切，3=XY轴裁切\n"
++"-A                全黑优化：C=1,M=1,Y=1统一转换为K=1\n"
++"-B                黑色清除：K通道为1时强制清空C/M/Y通道\n"
++"                  -A、-B 仅对bitcmyk输入生效\n"
++"-P                不输出START_PLANE指令，部分单色打印机需要此参数\n"
++"-X padlen         在BID数据段末尾追加零填充字节 [%d]\n"
+ "\n"
+-"Debugging Options:\n"
+-"-S plane          Output just a single color plane from a color print [all]\n"
+-"                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black\n"
+-"-D lvl            Set Debug level [%d]\n"
+-"-V                Version %s\n"
++"调试选项:\n"
++"-S plane          仅输出彩色打印单一色版 [默认输出全部色版]\n"
++"                  1=青色(C)，2=品红(M)，3=黄色(Y)，4=黑色(K)\n"
++"-D lvl            设置调试等级 [%d]\n"
++"-V                版本 %s\n"
+     , Duplex
+     , PageWidth , PageHeight
+     , MediaCode
+@@ -211,6 +210,7 @@ usage(void)
+     , Version
+     );
+ 
++
+   exit(1);
+ }
+ 
+diff --git a/foo2zjs-wrapper.in b/foo2zjs-wrapper.in
+index f575d8d..300e0f6 100755
+--- a/foo2zjs-wrapper.in
++++ b/foo2zjs-wrapper.in
+@@ -62,85 +62,84 @@ fi
+ 
+ usage() {
+ 	cat <<EOF
+-Usage:
+-	$BASENAME [options] [ps-file]
+-
+-	Foomatic printer wrapper for the foo2zjs printer driver.
+-	This script reads a Postscript ps-file or standard input
+-	and converts it to Zenographics ZjStream printer format.
+-
+-Normal Options:
+--c                Print in color (else monochrome)
+--C colormode      Colormode [$COLORMODE]
+-                    1=Photos, 2=Photo and text, 3=Graphics and text
+-                    10=ICM RGB color profile (using -G *.icm file)
+-                    gs9=New gs9+ ICM CMYK color profile (using -G *.icm file)
+--d duplex         Duplex code to send to printer [$DUPLEX]
+-                    1=off, 2=longedge, 3=shortedge
+--m media          Media code to send to printer [$MEDIA]
++用法:
++	$BASENAME [选项] [ps文件]
++
++	foo2zjs 打印机驱动的 Foomatic 包装脚本。
++	此脚本读取 Postscript 文件或标准输入，
++	并将其转换为 Zenographics ZjStream 打印机格式。
++
++普通选项:
++-c                彩色打印（否则为黑白）
++-C colormode      颜色模式 [$COLORMODE]
++                    1=照片, 2=照片和文本, 3=图形和文本
++                    10=ICM RGB 色彩配置文件（使用 -G *.icm 文件）
++                    gs9=新版 gs9+ ICM CMYK 色彩配置文件（使用 -G *.icm 文件）
++-d duplex         向打印机发送的双面打印代码 [$DUPLEX]
++                    1=关闭, 2=长边翻转, 3=短边翻转
++-m media          向打印机发送的介质代码 [$MEDIA]
+                   -z0:
+-                    1=standard, 2=transparency, 3=glossy, 257=envelope,
+-                    259=letterhead, 261=thickstock, 262=postcard, 263=labels
+-                  -z1,-z2,-z3: above plus
+-		    258=light, 261=cardstock, 263=rough, 265=labels,
+-                    267=envelope, 273=vellum, 512=color, 513=letterhead,
+-                    514=preprinted, 515=prepunched, 516=recycled
+--p paper          Paper code [$PAPER]
++                    1=普通纸, 2=透明胶片, 3=铜版纸, 257=信封,
++                    259=信纸, 261=厚纸, 262=明信片, 263=标签
++                  -z1,-z2,-z3: 上述选项外加
++		    258=薄纸, 261=卡纸, 263=粗糙纸, 265=标签,
++                    267=信封, 273=羊皮纸, 512=彩色纸, 513=信纸,
++                    514=预印纸, 515=预打孔纸, 516=再生纸
++-p paper          向打印机发送的纸张代码 [$PAPER]
+                   -z0:
+-                    1=letter, 5=legal, 7=executive, 9=A4, 11=A5, 13=B5jis
+-                    20=env#10, 27=envDL 28=envC5 34=envB5 37=envMonarch
+-                  -z1: -z0 plus
+-		    257=16K 197x273, 258=fanfold german legal, 259=b5iso,
+-                    260=postcard, 261=doublepostcard, 262=A6
+-                  -z2: -z0 plus
+-		    43=postcard, 70=A6, 82=double postcard rotated,
++                    1=Letter, 5=Legal, 7=Executive, 9=A4, 11=A5, 13=B5(JIS)
++                    20=信封#10, 27=信封DL, 28=信封C5, 34=信封B5, 37=信封Monarch
++                  -z1: 上述选项外加
++		    257=16K 197x273, 258=折页德国Legal, 259=B5(ISO),
++                    260=明信片, 261=双明信片, 262=A6
++                  -z2: 上述选项外加
++		    43=明信片, 70=A6, 82=旋转双明信片,
+ 		    257=16K 197x273, 263=16K 184x260, 264=16K 195x270,
+-                    258=fanfold german legal
+-                  -z3: -z0 plus
+-		    43=postcard, 70=A6, 82=double postcard rotated,
++                    258=折页德国Legal
++                  -z3: 上述选项外加
++		    43=明信片, 70=A6, 82=旋转双明信片,
+ 		    257=16K 197x273, 263=16K 184x260, 264=16K 195x270,
+-                    258=fanfold german legal, 268=photo4x6, 269=photo5x8,
+-		    270=photo10x15
+--n copies         Number of copies [$COPIES]
+--r <xres>x<yres>  Set device resolution in pixels/inch [$RES]
+--s source         Source code to send to printer [$SOURCE]
+-                    1=upper, 2=lower, 4=manual, 7=auto
+-		    Code numbers may vary with printer model.
+--t                Draft mode.  Every other pixel is white.
+--T density        Print density (1-5) [$DENSITY]
++                    258=折页德国Legal, 268=照片4x6, 269=照片5x8,
++		    270=照片10x15
++-n copies         打印份数 [$COPIES]
++-r <xres>x<yres>  设置设备分辨率（像素/英寸）[$RES]
++-s source         向打印机发送的纸盒来源代码 [$SOURCE]
++                    1=上纸盒, 2=下纸盒, 4=手动, 7=自动
++		    代码可能因打印机型号而异
++-t                草稿模式（每隔一个像素变白）
++-T density        打印浓度（1-5）[$DENSITY]
+ -2/-3/-4/-6/-8/-10/-12/-14/-15/-16/-18
+-                  Print with N-up (requires psutils)
+--o orient         For N-up: -op is portrait, -ol is landscape, -os is seascape.
+-
+-Printer Tweaking Options:
+--u <xoff>x<yoff>  Set offset of upper left printable in pixels [varies]
+--l <xoff>x<yoff>  Set offset of lower right printable in pixels [varies]
+--L mask           Send logical clipping values from -u/-l in ZjStream [3]
+-                  0=no, 1=Y, 2=X, 3=XY
+--P                Do not output START_PLANE codes.  May be needed by some
+-                  monochrome-only printers.
+--X padlen         Add extra zero padding to the end of BID segments [16]
+--z model          Model: [0]
++                  多页打印（需要 psutils）
++-o orient         多页打印方向：-op 纵向, -ol 横向, -os 倒置横向
++
++打印机调整选项:
++-u <xoff>x<yoff>  设置左上角可打印区域偏移量（像素）[可变]
++-l <xoff>x<yoff>  设置右下角可打印区域偏移量（像素）[可变]
++-L mask           在 ZjStream 中发送来自 -u/-l 的逻辑裁剪值 [3]
++                  0=禁用, 1=Y轴, 2=X轴, 3=XY轴
++-P                不输出 START_PLANE 代码。部分单色打印机可能需要此选项
++-X padlen         在 BID 段末尾添加额外的零填充 [16]
++-z model          机型: [0]
+                     0=KM 2300DL / HP 1000 / HP 1005
+                     1=HP 1018 / HP 1020 / HP 1022
+                     2=HP Pro P1102 / P1566 / P1606dn
+                     3=HP Pro CP1025nw
+ 
+-Color Tweaking Options:
+--g gsopts         Additional options to pass to Ghostscript, such as
+-                  -dDITHERPPI=nnn, etc.  May appear more than once. []
+--G profile.icm    Convert profile.icm to a Postscript CRD using icc2ps and
+-                  adjust colors using the setcolorrendering PS operator.
+-                  $SHARE/icm/ will be searched for profile.icm.
+--I intent         Select profile intent from ICM file [$INTENT]
+-                  0=Perceptual, 1=Colorimetric, 2=Saturation, 3=Absolute
+--G gamma-file.ps  Prepend gamma-file to the Postscript input to perform
+-                  color correction using the setcolortransfer PS operator.
+-
+-Debugging Options:
+--S plane          Output just a single color plane from a color print [all]
+-                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black
+--D lvl            Set Debug level [$DEBUG]
++色彩调整选项:
++-g gsopts         传递给 Ghostscript 的额外选项，例如
++                  -dDITHERPPI=nnn 等，可多次出现 []
++-G profile.icm    使用 icc2ps 将 profile.icm 转换为 Postscript CRD，
++                  并使用 setcolorrendering PS 操作符调整颜色。
++                  会搜索 $SHARE/icm/ 目录中的 profile.icm。
++-I intent         从 ICM 文件中选择配置意图 [$INTENT]
++                  0=感知, 1=色度, 2=饱和度, 3=绝对
++-G gamma-file.ps  将 gamma 文件前置到 Postscript 输入中，
++                  使用 setcolortransfer PS 操作符进行颜色校正。
++
++调试选项:
++-S plane          仅输出彩色打印中的单个颜色平面 [全部]
++                  1=青色, 2=品红, 3=黄色, 4=黑色
++-D lvl            设置调试级别 [$DEBUG]
+ -V                $VERSION
+ EOF
+ 
+diff --git a/foo2zjs.c b/foo2zjs.c
+index 869460b..5dbaf1e 100644
+--- a/foo2zjs.c
++++ b/foo2zjs.c
+@@ -160,92 +160,91 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"   foo2zjs [options] <pbmraw-file >zjs-file\n"
++"使用方式:\n"
++"   foo2zjs [选项] <pbmraw文件 >zjs文件\n"
+ "\n"
+-"	Convert Ghostscript pbmraw format to a monochrome ZJS stream,\n"
+-"	for driving the Minolta/QMS 2300 DL network color laser printer\n"
+-"	and other Zenographics-based black and white printers.\n"
++"	将Ghostscript pbmraw格式转换为单色ZJS打印数据流，\n"
++"	适用于美能达/QMS 2300 DL 网络彩色激光打印机\n"
++"	以及其他基于Zenographics协议的黑白打印机。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"		-sPAPERSIZE=letter -r1200x600 -sDEVICE=pbmraw \\ \n"
+-"		-sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"		-sPAPERSIZE=letter -r1200x600 -sDEVICE=pbmraw \\\n"
++"		-sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2zjs -r1200x600 -g10200x6600 -p1 >testpage.zm\n"
+ "\n"
+-"   foo2zjs [options] <bitcmyk-file >zjs-file\n"
+-"   foo2zjs [options] <pksmraw-file >zjs-file\n"
++"   foo2zjs [选项] <bitcmyk文件 >zjs文件\n"
++"   foo2zjs [选项] <pksmraw文件 >zjs文件\n"
+ "\n"
+-"	Convert Ghostscript bitcmyk or pksmraw format to a color ZJS stream,\n"
+-"	for driving the Minolta/QMS 2300 DL network color laser printer\n"
+-"	N.B. Color correction is expected to be performed by ghostscript.\n"
++"	将Ghostscript bitcmyk 或 pksmraw格式转换为彩色ZJS打印数据流，\n"
++"	适用于美能达/QMS 2300 DL 网络彩色激光打印机。\n"
++"	注意：色彩校正工作由Ghostscript完成。\n"
+ "\n"
+-"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\ \n"
+-"	    -sPAPERSIZE=letter -g10200x6600 -r1200x600 -sDEVICE=bitcmyk \\ \n"
+-"	    -sOutputFile=- - < testpage.ps \\ \n"
++"	gs -q -dBATCH -dSAFER -dQUIET -dNOPAUSE \\\n"
++"	    -sPAPERSIZE=letter -g10200x6600 -r1200x600 -sDEVICE=bitcmyk \\\n"
++"	    -sOutputFile=- - < testpage.ps \\\n"
+ "	| foo2zjs -r1200x600 -g10200x6600 -p1 >testpage.zc\n"
+ "\n"
+-"Normal Options:\n"
+-"-c                Force color mode if autodetect doesn't work\n"
+-"-d duplex         Duplex code to send to printer [%d]\n"
+-"                    1=off, 2=longedge, 3=shortedge\n"
+-"                    4=manual longedge, 5=manual shortedge\n"
+-"-g <xpix>x<ypix>  Set page dimensions in pixels [%dx%d]\n"
+-"-m media          Media code to send to printer [%d]\n"
+-"                  -z0:\n"
+-"                    1=standard, 2=transparency, 3=glossy, 257=envelope,\n"
+-"                    259=letterhead, 261=thickstock, 262=postcard, 263=labels\n"
+-"                  -z1,-z2: above plus\n"
+-"                    258=light, 261=cardstock, 263=rough, 265=labels,\n"
+-"                    267=envelope, 273=vellum, 512=color, 513=letterhead,\n"
+-"                    514=preprinted, 515=prepunched, 516=recycled\n"
+-"-p paper          Paper code to send to printer [%d]\n"
+-"                  -z0:\n"
+-"                    1=letter, 5=legal, 7=executive, 9=A4, 11=A5, 13=B5jis\n"
+-"                    20=env#10, 27=envDL 28=envC5 34=envB5 37=envMonarch\n"
+-"                  -z1: -z0 plus\n"
+-"                    257=16K 197x273, 258=fanfold german legal, 259=b5iso,\n"
+-"                    260=postcard, 261=doublepostcard, 262=A6\n"
+-"                  -z2: -z0 plus\n"
+-"                    43=postcard, 70=A6, 82=double postcard rotated,\n"
+-"                    257=16K 197x273, 263=16K 184x260, 264=16K 195x270,\n"
+-"                    258=fanfold german legal\n"
+-"                  -z3: -z0 plus\n"
+-"                    43=postcard, 70=A6, 82=double postcard rotated,\n"
+-"                    257=16K 197x273, 263=16K 184x260, 264=16K 195x270,\n"
+-"                    258=fanfold german legal, 268=photo4x6, 269=photo5x8,\n"
+-"                    270=photo10x15\n"
+-"-n copies         Number of copies [%d]\n"
+-"-r <xres>x<yres>  Set device resolution in pixels/inch [%dx%d]\n"
+-"-s source         Source code to send to printer [%d]\n"
+-"                    1=upper 2=lower 4=manual 7=auto\n"
+-"                    Code numbers may vary with printer model\n"
+-"-t                Draft mode.  Every other pixel is white.\n"
+-"-T density        Print density (1-5) [%d].\n"
+-"-J filename       Filename string to send to printer [%s]\n"
+-"-U username       Username string to send to printer [%s]\n"
++"常规选项:\n"
++"-c                自动检测失效时强制启用彩色模式\n"
++"-d duplex         下发至打印机的双面打印代码 [%d]\n"
++"                    1=关闭，2=长边翻转，3=短边翻转\n"
++"                    4=手动长边翻转，5=手动短边翻转\n"
++"-g <xpix>x<ypix>  设置页面尺寸，单位像素 [%dx%d]\n"
++"-m media          打印介质代码 [%d]\n"
++"                  -z0机型:\n"
++"                    1=普通纸，2=透明胶片，3=高光纸，257=信封，\n"
++"                    259=信头纸，261=厚纸，262=明信片，263=标签纸\n"
++"                  -z1、-z2机型：兼容以上参数，额外支持\n"
++"                    258=轻量纸，261=卡纸，263=粗糙纸，265=标签纸，\n"
++"                    267=信封，273=牛皮纸，512=彩色纸，513=信头纸，\n"
++"                    514=预印纸，515=预打孔纸，516=再生纸\n"
++"-p paper          纸张规格代码 [%d]\n"
++"                  -z0机型:\n"
++"                    1=Letter，5=Legal，7=Executive，9=A4，11=A5，13=JIS B5\n"
++"                    20=10号信封，27=DL信封，28=C5信封，34=B5信封，37=Monarch信封\n"
++"                  -z1机型：兼容-z0全部参数，额外支持\n"
++"                    257=16K(197×273)，258=德国折页Legal，259=ISO B5，\n"
++"                    260=明信片，261=双联明信片，262=A6\n"
++"                  -z2机型：兼容-z0全部参数，额外支持\n"
++"                    43=明信片，70=A6，82=旋转双联明信片，\n"
++"                    257=16K(197×273)，263=16K(184×260)，264=16K(195×270)，\n"
++"                    258=德国折页Legal\n"
++"                  -z3机型：兼容-z0全部参数，额外支持\n"
++"                    43=明信片，70=A6，82=旋转双联明信片，\n"
++"                    257=16K(197×273)，263=16K(184×260)，264=16K(195×270)，\n"
++"                    258=德国折页Legal，268=4×6寸相纸，269=5×8寸相纸，\n"
++"                    270=10×15cm相纸\n"
++"-n copies         打印份数 [%d]\n"
++"-r <xres>x<yres>  设置打印分辨率（像素/英寸）[%dx%d]\n"
++"-s source         进纸来源代码 [%d]\n"
++"                    1=上层纸盒，2=下层纸盒，4=手动进纸，7=自动选择\n"
++"                    代码编号随打印机型号有所差异\n"
++"-t                草稿模式，隔像素留白\n"
++"-T density        打印浓度（取值1-5）[%d]\n"
++"-J filename       发送至打印机的文件名 [%s]\n"
++"-U username       发送至打印机的用户名 [%s]\n"
+ "\n"
+-"Printer Tweaking Options:\n"
+-"-u <xoff>x<yoff>  Set offset of upper left printable in pixels [%dx%d]\n"
+-"-l <xoff>x<yoff>  Set offset of lower right printable in pixels [%dx%d]\n"
+-"-L mask           Send logical clipping values from -u/-l in ZjStream [%d]\n"
+-"                  0=no, 1=Y, 2=X, 3=XY\n"
+-"-A                AllIsBlack: convert C=1,M=1,Y=1 to just K=1\n"
+-"-B                BlackClears: K=1 forces C,M,Y to 0\n"
+-"                  -A, -B work with bitcmyk input only\n"
+-"-P                Do not output START_PLANE codes.  May be needed by some\n"
+-"                  some black and white only printers.\n"
+-"-X padlen         Add extra zero padding to the end of BID segments [%d]\n"
+-"-z model          Model: [%d]\n"
++"打印机微调选项:\n"
++"-u <xoff>x<yoff>  左上角可打印区域偏移量（像素）[%dx%d]\n"
++"-l <xoff>x<yoff>  右下角可打印区域偏移量（像素）[%dx%d]\n"
++"-L mask           在ZjStream数据流中启用 -u/-l 逻辑裁切参数 [%d]\n"
++"                  0=禁用，1=Y轴裁切，2=X轴裁切，3=XY轴裁切\n"
++"-A                全黑优化：C=1,M=1,Y=1统一转换为K=1\n"
++"-B                黑色清除：K通道为1时强制清空C/M/Y通道\n"
++"                  -A、-B 仅对bitcmyk输入生效\n"
++"-P                不输出START_PLANE指令，部分单色打印机需要此参数\n"
++"-X padlen         在BID数据段末尾追加零填充字节 [%d]\n"
++"-z model          指定机型 [%d]\n"
+ "                    0=KM 2300DL / HP 1000 / HP 1005\n"
+ "                    1=HP 1018 / HP 1020 / HP 1022\n"
+ "                    2=HP Pro P1102 / P1566 / P1606dn\n"
+ "                    3=HP Pro CP102?nw\n"
+ "\n"
+-"Debugging Options:\n"
+-"-S plane          Output just a single color plane from a color print [all]\n"
+-"                  1=Cyan, 2=Magenta, 3=Yellow, 4=Black\n"
+-"-D lvl            Set Debug level [%d]\n"
+-"-V                Version %s\n"
++"调试选项:\n"
++"-S plane          仅输出彩色打印单一色版 [默认输出全部色版]\n"
++"                  1=青色(C)，2=品红(M)，3=黄色(Y)，4=黑色(K)\n"
++"-D lvl            设置调试等级 [%d]\n"
++"-V                版本 %s\n"
+     , Duplex
+     , PageWidth , PageHeight
+     , MediaCode
+diff --git a/gipddecode.c b/gipddecode.c
+index a325710..f7f22b3 100644
+--- a/gipddecode.c
++++ b/gipddecode.c
+@@ -86,21 +86,21 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"	gipddecode [options] < zjs-file\n"
++"使用方式:\n"
++"	gipddecode [选项] < zjs文件\n"
+ "\n"
+-"	Decode Granite Image Printer Driver (GIPD) stream into human readable\n"
+-"	form. Granite Systems was acquired by Monotype Imaging.\n"
++"	将Granite图像打印机驱动（GIPD）数据流解码为可读文本格式。\n"
++"	Granite Systems 公司现已被蒙纳字体（Monotype Imaging）收购。\n"
+ "\n"
+-"	A GIPD stream is the printer language used by some Lexmark\n"
+-"	printers, such as the X500 and Dell printers, such as the 1125 MFP.\n"
++"	GIPD数据流是部分利盟打印机使用的打印语言，\n"
++"	例如 X500，以及戴尔部分打印机，如 1125 MFP。\n"
+ "\n"
+-"Options:\n"
+-"       -d basename Basename of .pbm file for saving decompressed planes\n"
+-"       -r basename Basename of .jbg file for saving raw planes\n"
+-"       -o          Print file offsets\n"
+-"       -h          Print hex file offsets\n"
+-"       -D lvl      Set Debug level [%d]\n"
++"选项:\n"
++"       -d basename 用于保存解压后图像通道的pbm文件基础名称\n"
++"       -r basename 用于保存原始图像通道的jbg文件基础名称\n"
++"       -o          输出文件偏移地址\n"
++"       -h          以十六进制输出文件偏移地址\n"
++"       -D lvl      设置调试等级 [%d]\n"
+     , Debug
+     );
+ 
+diff --git a/hbpldecode.c b/hbpldecode.c
+index fdb2812..ec7a926 100644
+--- a/hbpldecode.c
++++ b/hbpldecode.c
+@@ -79,32 +79,30 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"	hbpldecode [options] < hbpl-file\n"
++"使用方式:\n"
++"	hbpldecode [选项] < hbpl文件\n"
+ "\n"
+-"	Decode a HBPL stream into human readable form.  HBPL is\n"
+-"	Host Based Printer Language.\n"
++"	将HBPL数据流解码为可读文本格式。HBPL全称\n"
++"	主机驱动打印语言（Host Based Printer Language）。\n"
+ "\n"
+-"	There are two versions of HBPL in existence.\n"
++"	目前存在两个版本的HBPL协议。\n"
+ "\n"
+-"	Version one is an HBPL stream with Huffman RLE data. This data is\n"
+-"	used by the Dell 1250c, Dell C1660w, Epson AcuLaser C1700, Fuji-Xerox\n"
+-"	cp105b, and similar printers. These printers are supported by\n"
+-"	foo2hbpl1-wrapper et al.\n"
++"	第一版：采用霍夫曼RLE编码的HBPL数据流。\n"
++"	适用于戴尔 1250c、戴尔 C1660w、爱普生 AcuLaser C1700、富士施乐\n"
++"	cp105b 以及同系列打印机。这类打印机由 foo2hbpl1-wrapper 等工具支持。\n"
+ "\n"
+-"	Version two is an HBPL stream with JBIG encoded data. This data\n"
+-"	is used by the Xerox WorkCentre 6015, Fuji Xerox Docuprint CM205\n"
+-"	Dell 1355c, and similar printers. These printers are supported by\n"
+-"	foo2hbpl2-wrapper et al.\n"
++"	第二版：采用JBIG编码的HBPL数据流。\n"
++"	适用于施乐 WorkCentre 6015、富士施乐 Docuprint CM205、\n"
++"	戴尔 1355c 以及同系列打印机。这类打印机由 foo2hbpl2-wrapper 等工具支持。\n"
+ "\n"
+-"	Both versions can be decoded by hbpldecode.\n"
++"	hbpldecode 可解码以上两个版本的HBPL数据流。\n"
+ "\n"
+-"Options:\n"
+-"       -d basename Basename of .pbm file for saving decompressed planes\n"
+-"       -r basename Basename of .jbg file for saving raw planes\n"
+-"       -o          Print file offsets\n"
+-"       -h          Print hex file offsets\n"
+-"       -D lvl      Set Debug level [%d]\n"
++"选项:\n"
++"       -d basename 用于保存解压后图像通道的pbm文件基础名称\n"
++"       -r basename 用于保存原始图像通道的jbg文件基础名称\n"
++"       -o          输出文件偏移地址\n"
++"       -h          以十六进制输出文件偏移地址\n"
++"       -D lvl      设置调试等级 [%d]\n"
+     , Debug
+     );
+ 
+diff --git a/hipercdecode.c b/hipercdecode.c
+index 50cea78..26d12be 100644
+--- a/hipercdecode.c
++++ b/hipercdecode.c
+@@ -80,22 +80,21 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"	hipercdecode [options] < oki-file\n"
++"使用方式:\n"
++"	hipercdecode [选项] < oki文件\n"
+ "\n"
+-"	Decode a HIPERC into human readable form.  Uncompressed and JBIG\n"
+-"	are handled.\n"
++"	将HIPERC数据流解码为可读文本格式。支持未压缩格式与JBIG编码数据。\n"
+ "\n"
+-"	A HIPERC stream is the printer language used by the Oki Data C310dn,\n"
+-"	C3100, C3200n, C3250n, C3300n, C3400n, C5100n, C5250n, C5500n, C5600,\n"
+-"	and the C5800n printers.\n"
++"	HIPERC数据流是冲电气（Oki Data）打印机所使用的打印语言，\n"
++"	适用机型：C310dn、C3100、C3200n、C3250n、C3300n、C3400n、C5100n、C5250n、C5500n、C5600\n"
++"	以及 C5800n 打印机。\n"
+ "\n"
+-"Options:\n"
+-"       -d basename Basename of .pbm file for saving decompressed planes\n"
+-"       -r basename Basename of .jbg file for saving raw planes\n"
+-"       -o          Print file offsets\n"
+-"       -h          Print hex file offsets\n"
+-"       -D lvl      Set Debug level [%d]\n"
++"选项:\n"
++"       -d basename 用于保存解压后图像通道的pbm文件基础名称\n"
++"       -r basename 用于保存原始图像通道的jbg文件基础名称\n"
++"       -o          输出文件偏移地址\n"
++"       -h          以十六进制输出文件偏移地址\n"
++"       -D lvl      设置调试等级 [%d]\n"
+     , Debug
+     );
+ 
+diff --git a/icc2ps/cmssamp.c b/icc2ps/cmssamp.c
+index b6bfd85..6e08f49 100755
+--- a/icc2ps/cmssamp.c
++++ b/icc2ps/cmssamp.c
+@@ -89,7 +89,7 @@ int ComponentOf(int n, int clut, int nColorant)
+ 
+ 
+ // This routine does a sweep on whole input space, and calls its callback
+-// function on knots. returns TRUE if all ok, FALSE otherwise.
++// function on knots. returns TRUE if , FALSE otherwise.
+ 
+ LCMSBOOL LCMSEXPORT cmsSample3DGrid(LPLUT Lut, _cmsSAMPLER Sampler, LPVOID Cargo, DWORD dwFlags)
+ {
+diff --git a/jbig.c b/jbig.c
+index 24d86ae..365d530 100644
+--- a/jbig.c
++++ b/jbig.c
+@@ -98,15 +98,15 @@ static const int iindex[8][3] = {
+  * to return values from public functions in this library.
+  */
+ static const char *errmsg[] = {
+-  _("All OK"),                                               /* JBG_EOK */
+-  _("Reached specified image size"),                         /* JBG_EOK_INTR */
+-  _("Unexpected end of input data stream"),                  /* JBG_EAGAIN */
+-  _("Not enough memory available"),                          /* JBG_ENOMEM */
+-  _("ABORT marker segment encountered"),                     /* JBG_EABORT */
+-  _("Unknown marker segment encountered"),                   /* JBG_EMARKER */
+-  _("Input data stream contains invalid data"),              /* JBG_EINVAL */
+-  _("Input data stream uses unimplemented JBIG features"),   /* JBG_EIMPL */
+-  _("Incremental BIE does not continue previous one")        /* JBG_ENOCONT */
++  _("一切正常"),                                               /* JBG_EOK */
++  _("已达到指定图像尺寸"),                         /* JBG_EOK_INTR */
++  _("输入数据流意外结束"),                  /* JBG_EAGAIN */
++  _("可用内存不足"),                          /* JBG_ENOMEM */
++  _("遇到中止标记段"),                     /* JBG_EABORT */
++  _("遇到未知标记段"),                   /* JBG_EMARKER */
++  _("输入数据流包含无效数据"),              /* JBG_EINVAL */
++  _("输入数据流使用了未实现的JBIG特性"),   /* JBG_EIMPL */
++  _("增量BIE未继续前一图像")        /* JBG_ENOCONT */
+ };
+ 
+ 
+diff --git a/lavadecode.c b/lavadecode.c
+index 040e8e8..0a5fa5f 100644
+--- a/lavadecode.c
++++ b/lavadecode.c
+@@ -76,26 +76,27 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"	lavadecode [options] < zjs-file\n"
++"使用方式:\n"
++"	lavadecode [选项] < zjs文件\n"
+ "\n"
+-"	Decode a LAVAFLOW stream into human readable form.\n"
++"	将LAVAFLOW数据流解码为可读文本格式。\n"
+ "\n"
+-"	A LAVAFLOW stream is the printer language used by some Konica\n"
+-"	Minolta printers, such as the magicolor 2530 DL and 2490 MF.\n"
++"	LAVAFLOW数据流是部分柯尼卡美能达打印机使用的打印语言，\n"
++"	例如 magicolor 2530 DL 与 2490 MF。\n"
+ "\n"
+ "\n"
+-"Options:\n"
+-"       -d basename Basename of .pbm file for saving decompressed planes\n"
+-"       -o          Print file offsets\n"
+-"       -h          Print hex file offsets\n"
+-"       -D lvl      Set Debug level [%d]\n"
++"选项:\n"
++"       -d basename 用于保存解压后图像通道的pbm文件基础名称\n"
++"       -o          输出文件偏移地址\n"
++"       -h          以十六进制输出文件偏移地址\n"
++"       -D lvl      设置调试等级 [%d]\n"
+     , Debug
+     );
+ 
+     exit(1);
+ }
+ 
++
+ void
+ print_bih(unsigned char bih[20])
+ {
+diff --git a/oakdecode.c b/oakdecode.c
+index 0653954..abe265d 100644
+--- a/oakdecode.c
++++ b/oakdecode.c
+@@ -91,19 +91,19 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"	oakdecode [options] < OAKT-file\n"
++"使用方式:\n"
++"	oakdecode [选项] < OAKT文件\n"
+ "\n"
+-"	Decode an Oak Tech. OAKT printer stream into human readable form.\n"
++"	将Oak Tech OAKT打印数据流解码为可读文本格式。\n"
+ "\n"
+-"	OAKT is the printer language used by the HP 1500 printers.\n"
++"	OAKT是惠普 1500 系列打印机所使用的打印语言。\n"
+ "\n"
+-"Options:\n"
+-"       -d basename Basename of .pbm file for saving decompressed planes\n"
+-"       -r basename Basename of .jbg file for saving raw planes\n"
+-"       -i          Supress display of image records\n"
+-"       -o          Print file offsets\n"
+-"       -D lvl      Set Debug level [%d]\n"
++"选项:\n"
++"       -d basename 用于保存解压后图像通道的pbm文件基础名称\n"
++"       -r basename 用于保存原始图像通道的jbg文件基础名称\n"
++"       -i          不输出图像记录信息\n"
++"       -o          输出文件偏移地址\n"
++"       -D lvl      设置调试等级 [%d]\n"
+     , Debug
+     );
+ 
+diff --git a/opldecode.c b/opldecode.c
+index 6aebd33..451f7c1 100644
+--- a/opldecode.c
++++ b/opldecode.c
+@@ -76,20 +76,20 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"	opldecode [options] < zjs-file\n"
++"使用方式:\n"
++"	opldecode [选项] < zjs文件\n"
+ "\n"
+-"	Decode a Raster Object (opl) stream into human readable form.\n"
++"	将光栅对象（OPL）数据流解码为可读文本格式。\n"
+ "\n"
+-"	A Raster Object stream is the printer language used by some Konica\n"
+-"	Minolta printers, such as the magicolor 2480 MF.\n"
++"	光栅对象数据流是部分柯尼卡美能达打印机使用的打印语言，\n"
++"	例如 magicolor 2480 MF。\n"
+ "\n"
+ "\n"
+-"Options:\n"
+-"       -d basename Basename of .pbm file for saving decompressed planes\n"
+-"       -o          Print file offsets\n"
+-"       -h          Print hex file offsets\n"
+-"       -D lvl      Set Debug level [%d]\n"
++"选项:\n"
++"       -d basename 用于保存解压后图像通道的pbm文件基础名称\n"
++"       -o          输出文件偏移地址\n"
++"       -h          以十六进制输出文件偏移地址\n"
++"       -D lvl      设置调试等级 [%d]\n"
+     , Debug
+     );
+ 
+diff --git a/slxdecode.c b/slxdecode.c
+index 069dead..2e68217 100644
+--- a/slxdecode.c
++++ b/slxdecode.c
+@@ -78,24 +78,24 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"	slxdecode [options] < zjs-file\n"
++"使用方式:\n"
++"	slxdecode [选项] < zjs文件\n"
+ "\n"
+-"	Decode a SLX stream into human readable form.\n"
++"	将SLX数据流解码为可读文本格式。\n"
+ "\n"
+-"	A SLX stream is the printer language used by some Lexmark\n"
+-"	printers, such as the C500n.\n"
++"	SLX数据流是部分利盟打印机使用的打印语言，\n"
++"	例如 C500n。\n"
+ "\n"
+-"	More information on SLX Stream can be found at:\n"
++"	关于SLX数据流的更多信息可查阅：\n"
+ "\n"
+ "	http://softwareimaging.com/products-services/sorcerer/index.asp\n"
+ "\n"
+-"Options:\n"
+-"       -d basename Basename of .pbm file for saving decompressed planes\n"
+-"       -r basename Basename of .jbg file for saving raw planes\n"
+-"       -o          Print file offsets\n"
+-"       -h          Print hex file offsets\n"
+-"       -D lvl      Set Debug level [%d]\n"
++"选项:\n"
++"       -d basename 用于保存解压后图像通道的pbm文件基础名称\n"
++"       -r basename 用于保存原始图像通道的jbg文件基础名称\n"
++"       -o          输出文件偏移地址\n"
++"       -h          以十六进制输出文件偏移地址\n"
++"       -D lvl      设置调试等级 [%d]\n"
+     , Debug
+     );
+ 
+diff --git a/xqxdecode.c b/xqxdecode.c
+index f0ece6c..59ac6f4 100644
+--- a/xqxdecode.c
++++ b/xqxdecode.c
+@@ -77,20 +77,20 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"	xqxdecode [options] < zjs-file\n"
++"使用方式:\n"
++"	xqxdecode [选项] < zjs文件\n"
+ "\n"
+-"	Decode a XQX stream into human readable form.\n"
++"	将XQX数据流解码为可读文本格式。\n"
+ "\n"
+-"	A XQX stream is the printer language used by some HP LaserJet\n"
+-"	printers, such as the HP LaserJet M1005 (MFP).\n"
++"	XQX数据流是部分惠普激光打印机所使用的打印语言，\n"
++"	例如惠普 LaserJet M1005 多功能一体机(MFP)。\n"
+ "\n"
+ "\n"
+-"Options:\n"
+-"       -d basename Basename of .pbm file for saving decompressed planes\n"
+-"       -o          Print file offsets\n"
+-"       -h          Print hex file offsets\n"
+-"       -D lvl      Set Debug level [%d]\n"
++"选项:\n"
++"       -d basename 用于保存解压后图像通道的pbm文件基础名称\n"
++"       -o          输出文件偏移地址\n"
++"       -h          以十六进制输出文件偏移地址\n"
++"       -D lvl      设置调试等级 [%d]\n"
+     , Debug
+     );
+ 
+diff --git a/zjsdecode.c b/zjsdecode.c
+index 05ac22d..4e94779 100644
+--- a/zjsdecode.c
++++ b/zjsdecode.c
+@@ -79,25 +79,25 @@ void
+ usage(void)
+ {
+     fprintf(stderr,
+-"Usage:\n"
+-"	zjsdecode [options] < zjs-file\n"
++"使用方式:\n"
++"	zjsdecode [选项] < zjs文件\n"
+ "\n"
+-"	Decode a ZjStream into human readable form.\n"
++"	将ZjStream数据流解码为可读文本格式。\n"
+ "\n"
+-"	A ZjStream is the printer language used by some Minolta/QMS and\n"
+-"	HP printers, such as the 2300DL and LJ-1000.\n"
++"	ZjStream是部分美能达/QMS、惠普打印机使用的打印语言，\n"
++"	例如 2300DL 与 LaserJet 1000。\n"
+ "\n"
+-"	More information on Zenographics ZjStream can be found at:\n"
++"	Zenographics ZjStream 相关更多资料可访问：\n"
+ "\n"
+ "		http://ddk.zeno.com\n"
+ "\n"
+-"Options:\n"
+-"       -d basename Basename of .pbm file for saving decompressed planes\n"
+-"       -r basename Basename of .jbg file for saving raw planes\n"
+-"       -h          Print hex file offsets\n"
+-"       -o          Print file offsets\n"
+-"       -p          Don't do 4 byte padding\n"
+-"       -D lvl      Set Debug level [%d]\n"
++"选项:\n"
++"       -d basename 用于保存解压后图像通道的pbm文件基础名称\n"
++"       -r basename 用于保存原始图像通道的jbg文件基础名称\n"
++"       -h          以十六进制输出文件偏移地址\n"
++"       -o          输出文件偏移地址\n"
++"       -p          不执行4字节填充处理\n"
++"       -D lvl      设置调试等级 [%d]\n"
+     , Debug
+     );
+ 
